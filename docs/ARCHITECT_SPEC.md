@@ -545,6 +545,31 @@ class BattleField {
 
 ---
 
+## 11. Plan Arquitectónico v3.3 (Alta de tipos de unidad por URL)
+
+### Componentes nuevos
+- `web/UnitTypeAdminPage`: pantalla de alta/edición de tipo de unidad.
+- `units/CustomUnitTypeRepository`: almacén de tipos personalizados.
+- `integration/UnitUrlImportService`: servicio de importación desde URL.
+- `integration/UrlToUnitSchemaAgent`: adaptador para transformar contenido externo a esquema interno.
+
+### Contrato de interfaz de entrada (esquema normalizado)
+- Identidad: `name`, `creatureType`, `size`, `sourceUrl`.
+- Defensa y vida: `armorClass`, `hitPointsPerCreature`, `hitDiceFormula`.
+- Ataque: `baseAttackBonus`, `baseDamage`, `primaryAttack`, `secondaryAttack`, `reachFeet`.
+- Atributos: `strength`, `dexterity`, `constitution`, `intelligence`, `wisdom`, `charisma`.
+- Movimiento y moral: `speedFeet`, `morale`.
+- Metadatos: `imagePath`, `notes`, `tags`.
+
+### Flujo de arquitectura
+1. UI recibe URL + opción de importación.
+2. Servicio consulta/adquiere contenido.
+3. Agente transforma a esquema normalizado.
+4. UI muestra previsualización editable.
+5. Al confirmar, se guarda tipo personalizado y queda disponible para creación de unidades.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
@@ -553,3 +578,4 @@ class BattleField {
 - 2026-02-22: Arquitectura de combate actualizada a filas por alcance 5/10/15ft = 1/2/3.
 - 2026-02-22: Flujo de turno actualizado a 2 rondas por turno (equipos alternos).
 - 2026-02-22: Cálculo de frente efectivo contra enemigo +2 y extensión por segunda fila documentado.
+- 2026-02-22: Diseño v3.3 para alta web de tipos de unidad con agente URL -> esquema.

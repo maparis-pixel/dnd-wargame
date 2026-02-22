@@ -33,6 +33,12 @@
 - Persecución de unidades en huida: decisión manual en CLI.
 - Reagrupamiento: único intento con personaje aliado en trayectoria.
 
+### 🧩 **Plan siguiente v3.3 (alta de tipos por URL)**
+- Nueva página web para dar de alta tipos de unidad personalizados.
+- Entrada de URL de ficha D&D y transformación asistida por agente.
+- Previsualización editable en formulario normalizado antes de guardar.
+- Tipos guardados reutilizables en creación de unidades.
+
 ### 📁 **Archivos Clave**
 - `src/com/dnd/wargames/` - Código fuente completo
 - `run_system.bat` - Ejecución automática completa

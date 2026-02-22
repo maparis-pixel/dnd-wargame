@@ -452,6 +452,14 @@ THEN: Mismo número, PF, posiciones, estados se restauran
 - FR-15: Reagrupamiento posible una sola vez si hay personaje aliado en ruta.
 - FR-16: La salida de combate debe reportar chequeo de moral, retirada, persecución y reagrupamiento.
 
+### Requisitos Funcionales de Plataforma (v3.3)
+- FR-17: La web debe incluir una página de **Alta de tipo de unidad**.
+- FR-18: El usuario puede introducir una URL de ficha D&D para iniciar importación.
+- FR-19: Un agente transforma la URL a un esquema estándar de entrada de unidad.
+- FR-20: El usuario puede revisar/editar los campos importados antes de guardar.
+- FR-21: El tipo guardado queda disponible para crear unidades nuevas en combate.
+- FR-22: Debe registrarse trazabilidad mínima (`sourceUrl`, fecha de importación, errores/ajustes).
+
 ---
 
 ## Versión
@@ -462,3 +470,4 @@ THEN: Mismo número, PF, posiciones, estados se restauran
 - 2026-02-22: Reglas de filas por alcance actualizadas a 5/10/15ft = 1/2/3.
 - 2026-02-22: Nuevo requisito de frente efectivo limitado por frente enemigo +2.
 - 2026-02-22: Añadidos bono por filas y estructura de turno con 2 rondas por turno.
+- 2026-02-22: Nuevos FR-17..FR-22 para alta de tipos de unidad por URL con agente.

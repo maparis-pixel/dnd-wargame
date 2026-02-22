@@ -89,6 +89,24 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 4. Limitar reagrupamiento a un intento, asistido por personaje aliado.
 5. Añadir pruebas de aceptación de moral, retirada y persecución.
 
+## Plan v3.3 (Nuevas Unidades desde URL)
+
+### Objetivo
+- Añadir una página web para registrar **nuevos tipos de unidad** usando datos de ficha D&D.
+
+### Flujo objetivo
+1. El usuario introduce una URL de la ficha de criatura.
+2. Un agente transforma el contenido a una **interfaz de entrada estándar**.
+3. El usuario revisa/edita los campos normalizados.
+4. El sistema crea un nuevo tipo de unidad reutilizable en batalla.
+
+### Entregables
+- Endpoint y pantalla web para “Alta de tipo de unidad”.
+- Esquema de datos normalizado para ficha D&D.
+- Adaptador de agente URL -> esquema de unidad.
+- Persistencia de tipos personalizados.
+
 ## Changelog Corto
 - 2026-02-22: Sincronización de reglas de combate (filas por alcance, frente enemigo +2, bono por filas, turnos por 2 rondas).
 - 2026-02-22: Política de iteración y suite mínima de validación consolidada.
+- 2026-02-22: Plan v3.3 añadido (alta de unidades desde URL mediante agente).

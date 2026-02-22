@@ -663,6 +663,19 @@ Additional Notes:
 
 ---
 
+## 13. Plan QA v3.3 (Alta de tipos por URL)
+
+### Casos de aceptación mínimos
+1. URL válida -> agente devuelve esquema normalizado visible en formulario.
+2. URL inválida/inaccesible -> mensaje de error y no persistencia.
+3. Importación parcial -> formulario editable con campos faltantes marcados.
+4. Guardado exitoso -> nuevo tipo disponible en creación de unidad.
+5. Validación de rangos (AC, HP, stats, reach, morale) antes de persistir.
+6. Trazabilidad guardada (`sourceUrl`, fecha, usuario/sesión si aplica).
+7. Seguridad básica: no ejecutar scripts externos ni aceptar esquemas no permitidos.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
@@ -671,3 +684,4 @@ Additional Notes:
 - 2026-02-22: Cobertura QA actualizada para validar frente enemigo +2 y recálculo por bajas.
 - 2026-02-22: Añadida validación de bono por filas (+2 por fila desde la segunda).
 - 2026-02-22: Validación del modelo de turno por 2 rondas incorporada al gate funcional.
+- 2026-02-22: Plan QA v3.3 añadido para importación de tipos de unidad desde URL.

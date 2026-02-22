@@ -51,6 +51,13 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
 4. Limitar reagrupamiento a un único intento con personaje aliado.
 5. Añadir pruebas de aceptación para moral, retirada y persecución.
 
+### Nueva línea de desarrollo acordada (v3.3)
+1. Crear página web de alta de tipos de unidad personalizados.
+2. Permitir importación desde URL de ficha D&D.
+3. Definir interfaz de entrada normalizada para datos importados.
+4. Integrar agente de transformación URL -> interfaz.
+5. Guardar y reutilizar tipos nuevos en creación de unidades.
+
 3. **Interfaz (cli/)**
    - CommandLineInterface: Menú interactivo completo
    - Gestión de personajes y unidades

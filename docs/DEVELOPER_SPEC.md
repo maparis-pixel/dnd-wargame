@@ -679,6 +679,24 @@ Cada clase debe:
 
 ---
 
+## 9. Plan Técnico v3.3 (Nuevos tipos de unidad por URL)
+
+### Decisiones de implementación
+- La web tendrá una vista dedicada de alta de tipo de unidad.
+- La importación por URL no crea la unidad directamente: primero llena un formulario editable.
+- Se define un DTO canónico `UnitTypeInputDTO` como contrato único entre agente y backend.
+
+### Backlog técnico
+1. Crear DTO `UnitTypeInputDTO` y validaciones de campos obligatorios/rangos.
+2. Añadir endpoint web para importar por URL y endpoint para guardar tipo personalizado.
+3. Implementar adaptador de agente `UrlToUnitSchemaAgent`.
+4. Mapear `UnitTypeInputDTO` a entidad persistida de tipo de unidad.
+5. Exponer tipos personalizados en CLI/Web al crear unidades.
+6. Gestionar errores de importación (URL inválida, parse incompleto, campos faltantes).
+7. Añadir logs de trazabilidad: URL origen, fecha de importación, cambios manuales.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
@@ -687,3 +705,4 @@ Cada clase debe:
 - 2026-02-22: DoD ampliado con validaciones técnicas de frente enemigo +2, bono por filas y recálculo tras bajas.
 - 2026-02-22: Regla de filas por alcance normalizada (5/10/15ft = 1/2/3).
 - 2026-02-22: Iniciativa y estructura de turno (2 rondas) añadidas como regla de implementación.
+- 2026-02-22: Plan técnico v3.3 añadido para importar y crear tipos de unidad desde URL.
