@@ -21,12 +21,13 @@ public class CombatResolver {
      */
     public static AttackResult resolveUnitVsUnit(CombatUnit attacker, CombatUnit defender) {
         // Tirada de ataque: d20 + attack bonus + mass bonus
-        int attackRoll = DiceRoller.rollD20(attacker.getBaseAttackBonus() + attacker.getMassBonus());
+        int moraleMod = attacker.getMoraleAttackModifier();
+        int attackRoll = DiceRoller.rollD20(attacker.getBaseAttackBonus() + attacker.getMassBonus() + moraleMod);
 
         System.out.println("🎲 " + attacker.getName() + " ataca a " + defender.getName());
-        System.out.println("   Tirada: " + (attackRoll - attacker.getBaseAttackBonus() - attacker.getMassBonus()) +
+        System.out.println("   Tirada: " + (attackRoll - attacker.getBaseAttackBonus() - attacker.getMassBonus() - moraleMod) +
                           " + " + attacker.getBaseAttackBonus() + " (bonus) + " +
-                          attacker.getMassBonus() + " (masa) = " + attackRoll);
+                  attacker.getMassBonus() + " (masa) + " + moraleMod + " (moral) = " + attackRoll);
         System.out.println("   CA objetivo: " + defender.getArmorClass());
 
         if (attackRoll >= defender.getArmorClass()) {
@@ -95,12 +96,13 @@ public class CombatResolver {
      */
     public static AttackResult resolveUnitVsCharacter(CombatUnit attacker, Character defender) {
         // Unidad ataca con bono de ataque + bono de masa
-        int attackRoll = DiceRoller.rollD20(attacker.getBaseAttackBonus() + attacker.getMassBonus());
+        int moraleMod = attacker.getMoraleAttackModifier();
+        int attackRoll = DiceRoller.rollD20(attacker.getBaseAttackBonus() + attacker.getMassBonus() + moraleMod);
 
         System.out.println("👥 " + attacker.getName() + " ataca a " + defender.getName());
-        System.out.println("   Tirada: " + (attackRoll - attacker.getBaseAttackBonus() - attacker.getMassBonus()) +
+        System.out.println("   Tirada: " + (attackRoll - attacker.getBaseAttackBonus() - attacker.getMassBonus() - moraleMod) +
                           " + " + attacker.getBaseAttackBonus() + " (bonus) + " +
-                          attacker.getMassBonus() + " (masa) = " + attackRoll);
+                  attacker.getMassBonus() + " (masa) + " + moraleMod + " (moral) = " + attackRoll);
         System.out.println("   CA objetivo: " + defender.getArmorClass());
 
         if (attackRoll >= defender.getArmorClass()) {

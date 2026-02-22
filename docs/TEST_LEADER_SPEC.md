@@ -19,14 +19,28 @@
 - **Integration Tests**: Todos los flujos críticos
 - **Smoke Tests**: Validaciones básicas pre-deployment
 
+### 1.3 Gate Obligatorio por Iteración
+
+En este repositorio, cada iteración debe ejecutar:
+
+1. Compilación completa del proyecto.
+2. Suite mínima obligatoria:
+  - `com.dnd.wargames.test.SimpleTest`
+  - `com.dnd.wargames.test.BasicTest`
+  - `com.dnd.wargames.test.MoraleAndWebSmokeTest`
+
+Si cualquier punto falla, la iteración no se considera válida.
+
 ---
 
 ## 2. Unit Testing Specification
 
 ### 2.1 Framework & Tools
-- **Framework**: JUnit 5 (Jupiter)
-- **Mocking**: Mockito
-- **Coverage**: JaCoCo
+- **Estado actual en repo**: Tests ejecutables por clase `main` (sin JUnit)
+- **Ejecución**: `java -cp src <test-class>`
+- **Cobertura mínima funcional**: smoke + validaciones de mecánicas core
+
+Nota: La adopción de JUnit puede planificarse como mejora futura, pero la validación actual obligatoria se realiza con tests `main`.
 
 ### 2.2 Estructura de Tests (Wargame Scale)
 ```

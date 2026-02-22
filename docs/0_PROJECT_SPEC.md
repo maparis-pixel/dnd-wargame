@@ -38,9 +38,26 @@ docs/
 2. **Para agregar features**: Actualizar los specs correspondientes según el rol
 3. **Para validar**: Verificar que todas las especificaciones se cumplen
 
+## Política de Iteración Obligatoria
+
+Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
+
+1. Actualizar documentación de plan y de perfiles afectados:
+	- `ARCHITECT_SPEC.md`
+	- `DEVELOPER_SPEC.md`
+	- `TEST_LEADER_SPEC.md`
+	- `REQUIREMENTS.md` (si aplica)
+2. Compilar el proyecto completo.
+3. Ejecutar la suite mínima de validación funcional:
+	- `com.dnd.wargames.test.SimpleTest`
+	- `com.dnd.wargames.test.BasicTest`
+	- `com.dnd.wargames.test.MoraleAndWebSmokeTest`
+4. Si falla compilación o tests, corregir y repetir.
+
 ## Versión
 - v1.0 - Creado: 2026-02-08
-- Estado: Definición Inicial
+- v2.1 - Actualizado: 2026-02-22 (Web UI + política obligatoria compile/tests)
+- Estado: Activo y en evolución
 
 ## Links de Referencia
 - README general: [../README.md](../README.md)

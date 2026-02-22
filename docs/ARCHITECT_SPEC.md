@@ -41,6 +41,9 @@ com.dnd.wargames
 │   ├── MassBonus.java          (Cálculo de bono masa)
 │   └── InitiativeTracker.java  (Orden de turnos)
 │
+├── web/                        (Interfaz Web ligera)
+│   └── WebBattleServer.java    (Servidor HTTP embebido)
+│
 ├── spells/                     (Sistema de magia a escala)
 │   ├── SpellCaster.java        (Base para Mago/Clérigo/Bardo)
 │   ├── Spell.java              (Interfaz de hechizo)
@@ -111,6 +114,20 @@ WargameManager
 - **Config**: Constantes de reglas, bonificadores
 - **Events**: Sistema de eventos de combate para logging
 
+### 2.4 Modo Web Implementado (2026-02)
+
+- Servidor embebido con `com.sun.net.httpserver.HttpServer` en puerto `8080`.
+- Flujo de configuración en navegador:
+    - Tipo de unidad
+    - Equipo (`Aliados` / `Enemigos`)
+    - Nº de compañías por tipo
+    - PF por compañía
+- Ejecución de batalla por bloques de turnos:
+    - Usuario indica cuántos turnos ejecutar
+    - El sistema devuelve estado actualizado y log del bloque
+    - Se vuelve a solicitar nuevo bloque hasta fin de batalla
+- Estado en memoria por sesión de batalla (ID único), sin persistencia en disco.
+
 ---
 
 ## 3. Arquitectura de Combate (Wargame Scale)
@@ -135,6 +152,15 @@ WargameManager
    └─ Chequear condición de fin: ¿Alguien muerto/derrotado?
    ↓
 4. Fin de Batalla: Calcular loot/experiencia
+
+### 3.4 Moral Operativa (estado actual)
+
+- El estado de moral se actualiza dinámicamente con PF restantes.
+- Efectos activos en ataque de unidad:
+    - `RAGING`: +2 al ataque
+    - `CONFUSED`: -1 al ataque
+    - `FRIGHTENED`: -2 al ataque
+- Estos modificadores se aplican en `CombatResolver` para ataques de unidad vs unidad y unidad vs personaje.
 ```
 
 ### 3.2 Sistema de Daño Asimétrico

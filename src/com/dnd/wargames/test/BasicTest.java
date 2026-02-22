@@ -2,8 +2,10 @@ package com.dnd.wargames.test;
 
 import com.dnd.wargames.units.Character;
 import com.dnd.wargames.units.CombatUnit;
+import com.dnd.wargames.units.MoraleEffect;
 import com.dnd.wargames.units.UnitFactory;
 import com.dnd.wargames.battle.*;
+import com.dnd.wargames.web.WebBattleServer;
 
 /**
  * Test básico para verificar que el sistema funciona.
@@ -103,6 +105,40 @@ public class BasicTest {
 
         } catch (Exception e) {
             System.out.println("❌ Error en motor de batalla: " + e.getMessage());
+            allTestsPassed = false;
+        }
+
+        // Test 5: Moral dinámica y modificadores
+        System.out.println("\n5. Test: Moral y modificadores de ataque");
+        try {
+            CombatUnit guardias = UnitFactory.createHumanGuards(10);
+
+            guardias.takeDamage(2); // 8/10 PF -> unidad con moral alta casi intacta
+            assert guardias.getMoraleStatus() == MoraleEffect.RAGING : "Debería estar Enfurecida";
+            assert guardias.getMoraleAttackModifier() == 2 : "Enfurecida debería dar +2";
+
+            guardias.takeDamage(3); // 5/10 PF
+            assert guardias.getMoraleStatus() == MoraleEffect.CONFUSED : "Debería estar Confundida";
+            assert guardias.getMoraleAttackModifier() == -1 : "Confundida debería dar -1";
+
+            guardias.takeDamage(3); // 2/10 PF
+            assert guardias.getMoraleStatus() == MoraleEffect.FRIGHTENED : "Debería estar Asustada";
+            assert guardias.getMoraleAttackModifier() == -2 : "Asustada debería dar -2";
+
+            System.out.println("✅ Moral dinámica y modificadores funcionando");
+        } catch (Exception e) {
+            System.out.println("❌ Error en test de moral: " + e.getMessage());
+            allTestsPassed = false;
+        }
+
+        // Test 6: Smoke de infraestructura web
+        System.out.println("\n6. Test: Smoke WebBattleServer");
+        try {
+            WebBattleServer server = new WebBattleServer();
+            assert server != null : "WebBattleServer no debería ser null";
+            System.out.println("✅ WebBattleServer instanciable");
+        } catch (Exception e) {
+            System.out.println("❌ Error en smoke web: " + e.getMessage());
             allTestsPassed = false;
         }
 

@@ -1,6 +1,7 @@
 package com.dnd.wargames;
 
 import com.dnd.wargames.cli.CommandLineInterface;
+import com.dnd.wargames.web.WebBattleServer;
 
 /**
  * Punto de entrada principal para D&D Wargames.
@@ -17,6 +18,12 @@ public class DndWargames {
         System.out.println();
 
         try {
+            if (args.length > 0 && "web".equalsIgnoreCase(args[0])) {
+                WebBattleServer webServer = new WebBattleServer();
+                webServer.start();
+                return;
+            }
+
             // Iniciar interfaz de línea de comandos
             CommandLineInterface cli = new CommandLineInterface();
             cli.start();

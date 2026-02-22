@@ -158,9 +158,30 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con dos
 - Éxito: Continúa combatiendo normalmente
 
 #### FR-6.2: Estados Especiales
-- **Asustada**: -1 a tiradas de ataque, velocidad reducida
-- **Confundida**: Puede atacar aliados por error
+- **Asustada**: -2 a tiradas de ataque de unidad
+- **Confundida**: -1 a tiradas de ataque de unidad
+- **Enfurecida**: +2 a tiradas de ataque de unidad
 - **Aturdida**: Pierde acción dedicada siguiente turno
+
+### FR-11: Interfaz Web de Configuración y Ejecución por Bloques
+**Descripción**: Permitir configurar batalla y ejecutar turnos desde navegador.
+
+#### FR-11.1: Configuración de compañías
+- Mostrar tipos de unidad disponibles.
+- Para cada tipo, solicitar:
+  - Equipo (`Aliados` o `Enemigos`)
+  - Número de compañías
+  - PF por compañía
+
+#### FR-11.2: Ejecución por bloques de turnos
+- Solicitar cuántos turnos ejecutar de seguido.
+- Ejecutar el bloque solicitado.
+- Mostrar resultado parcial (estado + log del bloque).
+- Volver a solicitar nuevo número de turnos mientras la batalla siga activa.
+
+#### FR-11.3: Finalización
+- Detectar fin automático cuando un equipo quede sin unidades vivas.
+- Mostrar ganador final y permitir iniciar nueva batalla.
 
 ### FR-7: Sistema de Battlefield (Campo de Batalla)
 **Descripción**: Mapa hexagonal o cuadriculado para posicionamiento

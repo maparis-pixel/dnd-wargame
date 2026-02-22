@@ -147,6 +147,45 @@ public class CombatUnit {
         if (pfLost > 0) {
             strengthPoints = Math.max(0, strengthPoints - pfLost);
             currentDamageAccumulated = currentDamageAccumulated % durability;
+            updateMoraleStatus();
+        }
+    }
+
+    /**
+     * Actualiza el estado de moral según PF restantes y moral base.
+     */
+    private void updateMoraleStatus() {
+        if (!isAlive()) {
+            moraleStatus = MoraleEffect.NONE;
+            return;
+        }
+
+        double ratio = (double) strengthPoints / (double) maxStrengthPoints;
+
+        if (ratio <= 0.25) {
+            moraleStatus = MoraleEffect.FRIGHTENED;
+        } else if (ratio <= 0.50) {
+            moraleStatus = MoraleEffect.CONFUSED;
+        } else if (morale >= 15 && ratio >= 0.80) {
+            moraleStatus = MoraleEffect.RAGING;
+        } else {
+            moraleStatus = MoraleEffect.NONE;
+        }
+    }
+
+    /**
+     * Modificador de ataque por estado de moral.
+     */
+    public int getMoraleAttackModifier() {
+        switch (moraleStatus) {
+            case RAGING:
+                return 2;
+            case CONFUSED:
+                return -1;
+            case FRIGHTENED:
+                return -2;
+            default:
+                return 0;
         }
     }
 

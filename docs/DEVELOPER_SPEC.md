@@ -7,6 +7,24 @@
 
 ## 1. Estándares de Código
 
+### 1.0 Protocolo de Iteración Obligatorio (DoD)
+
+Para cada cambio funcional o técnico:
+
+1. Actualizar documentación de rol y requisitos impactados (`docs/*.md`).
+2. Compilar proyecto completo.
+3. Ejecutar validación mínima obligatoria:
+    - `java -cp src com.dnd.wargames.test.SimpleTest`
+    - `java -cp src com.dnd.wargames.test.BasicTest`
+    - `java -cp src com.dnd.wargames.test.MoraleAndWebSmokeTest`
+4. No cerrar iteración si hay fallos.
+
+Checklist mínimo por PR/iteración:
+- [ ] Código compila
+- [ ] Tests mínimos pasan
+- [ ] Specs de rol actualizados
+- [ ] Cambios funcionales reflejados en `REQUIREMENTS.md` y `README.md`
+
 ### 1.1 Naming Conventions
 - **Clases**: PascalCase (`Character`, `BattleEngine`)
 - **Métodos/Variables**: camelCase (`getHealth()`, `playerAction`)

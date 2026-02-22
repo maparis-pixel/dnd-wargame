@@ -6,6 +6,7 @@ REM Compilar todas las clases
 javac -d bin -cp . src/com/dnd/wargames/units/*.java
 javac -d bin -cp . src/com/dnd/wargames/battle/*.java
 javac -d bin -cp . src/com/dnd/wargames/cli/*.java
+javac -d bin -cp . src/com/dnd/wargames/web/*.java
 javac -d bin -cp . src/com/dnd/wargames/demo/*.java
 javac -d bin -cp . src/com/dnd/wargames/test/*.java
 javac -d bin -cp . src/com/dnd/wargames/DndWargames.java
@@ -27,6 +28,10 @@ java -cp bin com.dnd.wargames.test.SimpleTest
 echo.
 echo Ejecutando BasicTest...
 java -cp bin com.dnd.wargames.test.BasicTest
+
+echo.
+echo Ejecutando MoraleAndWebSmokeTest...
+java -cp bin com.dnd.wargames.test.MoraleAndWebSmokeTest
 
 echo.
 echo Ejecutando CombatDemo...

@@ -1,7 +1,7 @@
 # D&D Wargames - Simulador de Combate a Escala de Batallón
 
 **Versión**: 2.0 (Wargame Scale)  
-**Interfaz**: Command Line Interface (CLI)
+**Interfaz**: CLI + Web
 **Estado**: ✅ **COMPLETAMENTE FUNCIONAL**
 
 ## 📊 Estado Actual del Proyecto (21 Feb 2026)
@@ -102,7 +102,15 @@ java -cp src com.dnd.wargames.demo.CombatDemo
 
 # Ejecutar CLI interactivo
 java -cp src com.dnd.wargames.cli.CommandLineInterface
+
+# Ejecutar app principal en modo CLI
+java -cp src com.dnd.wargames.DndWargames
+
+# Ejecutar app principal en modo Web
+java -cp src com.dnd.wargames.DndWargames web
 ```
+
+Al iniciar modo Web, abre: `http://localhost:8080`
 
 ## 🎯 Lo Que Verás
 
@@ -194,6 +202,13 @@ java -cp bin com.dnd.wargames.demo.CombatDemo
 - **Personaje vs Unidad**: Personajes tienen **ventaja** (2d20, toma mayor)
 - **Unidad vs Unidad**: d20 + bono ataque + bono masa (+1 por cada 5 PF)
 - **Unidad vs Personaje**: Daño directo a HP del personaje
+
+#### Moral
+- El estado de moral cambia con PF restantes:
+  - **Enfurecido**: unidad con moral alta y casi intacta (>= 80% PF) → **+2 ataque**
+  - **Confundido**: unidad dañada (<= 50% PF) → **-1 ataque**
+  - **Asustado**: unidad al borde de colapso (<= 25% PF) → **-2 ataque**
+  - **Normal**: sin modificador
 
 #### Sistema de Daño
 - **Regla de Hender**: Si superas CA por 5+, +1 PF daño adicional
