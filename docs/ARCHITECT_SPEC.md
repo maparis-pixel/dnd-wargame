@@ -2,7 +2,7 @@
 
 **Rol:** System Architect  
 **Responsabilidad:** Diseño de arquitectura, componentes y estructura del sistema  
-**Versión:** 3.0 (Warhammer HP System)
+**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
 
 ---
 
@@ -26,6 +26,16 @@
 - **Moral 2d6**: `DiceRoller.roll2D6()` + chequeo en `CombatUnit.checkMorale(2d6)`
 - **Multi-ataques**: `CombatResolver` usa `getAttacksAvailable()` (frontWidth × rows)
 - **Web Stats**: `WebBattleServer.renderHomePage()` muestra stats debajo del nombre de unidad
+
+### 1.4 Cambios Arquitectónicos v3.1 (2026-02-22)
+- **Filas por alcance** en `CombatUnit`: 5ft=1, 10ft=2, 15ft=3.
+- **Frente efectivo contra enemigo**: tope inicial `enemyFront + 2`, con extensión si completa dos filas.
+- **Bono por filas ocupadas**: +2 por fila adicional desde la segunda.
+- **Re-cálculo continuo tras bajas**: ataques y filas se recalculan con criaturas restantes.
+- **Turnos por rondas de equipo** en `WargameBattleEngine`:
+    - 1 turno = ronda de aliados + ronda de enemigos.
+    - El equipo de la unidad viva con mayor iniciativa actúa primero en ese turno.
+    - Iniciativa tirada una vez por combatiente (`1d20 + mod DEX`).
 
 ---
 
@@ -167,17 +177,12 @@ WargameManager
    ↓
 2. Determinar Iniciativa: Todos combatientes tiran d20+DEX
    ↓
-3. RONDA (repetir):
-   ├─ Para cada Combatient en orden:
-   │  ├─ TURNO:
-   │  │  ├─ Elegir acción (Ataque, Hechizo, Movimiento)
-   │  │  ├─ Ejecutar acción via CombatResolver
-   │  │  ├─ Aplicar daño (reduce PF si unidad, HP si personaje)
-   │  │  └─ Chequear Moral si es necesario
-   │  │
-   │  └─ Reacciones (HeroicReaction, AoO) durante turno enemigo
-   │
-   └─ Chequear condición de fin: ¿Alguien muerto/derrotado?
+3. TURNO (repetir):
+    ├─ Ronda 1: equipo con mayor iniciativa viva
+    │  └─ Cada combatiente vivo de ese equipo actúa en orden de iniciativa
+    ├─ Ronda 2: equipo contrario
+    │  └─ Cada combatiente vivo de ese equipo actúa en orden de iniciativa
+    └─ Chequear condición de fin: ¿algún equipo sin combatientes vivos?
    ↓
 4. Fin de Batalla: Calcular loot/experiencia
 
@@ -527,3 +532,8 @@ class BattleField {
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
+
+## Changelog Corto
+- 2026-02-22: Arquitectura de combate actualizada a filas por alcance 5/10/15ft = 1/2/3.
+- 2026-02-22: Flujo de turno actualizado a 2 rondas por turno (equipos alternos).
+- 2026-02-22: Cálculo de frente efectivo contra enemigo +2 y extensión por segunda fila documentado.

@@ -2,7 +2,7 @@
 
 **Estado:** Actualizado - Warhammer HP System  
 **Versión:** 3.0  
-**Fecha:** 2026-02-09
+**Fecha:** 2026-02-22
 
 ---
 
@@ -16,8 +16,10 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
 
 ### Mecánicas Clave (v3.0 - Sistema Warhammer):
 - **HP por Compañía**: En lugar de PF, cada compañía tiene HP = (criaturas × HP individual)
-- **Formación**: Frente, flancos, filas atacantes (2 base, 3 si alcance 10ft)
-- **Multi-ataques**: Ataques disponibles = FrenteWidth × FilasAtacantes
+- **Formación**: Frente, flancos, filas atacantes (5ft=1, 10ft=2, 15ft=3)
+- **Frente efectivo de ataque**: Máximo frente enemigo +2 (con extensión si completa 2 filas)
+- **Multi-ataques**: Ataques según frente efectivo × filas alcanzables con criaturas disponibles
+- **Bono por filas**: +2 al ataque por fila ocupada desde la segunda
 - **Moral Warhammer**: Chequeo 2d6 vs valor de moral (2-12) cuando porta estandarte cae o 50% de bajas
 - **Huida**: Si falla moral, la unidad huye del combate
 
@@ -46,7 +48,7 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
   - **Formación**:
     - `frontWidth`: Ancho del frente en criaturas
     - `flankExposure`: Exposición de flancos en criaturas
-    - `rowsAttacking`: Filas que pueden atacar (2 base, 3 si reach ≥ 10ft)
+    - `rowsAttacking`: Filas máximas por alcance (5ft=1, 10ft=2, 15ft=3)
   - **Moral Warhammer**: Valor entre 2-12 para chequeo 2d6
   - **Porta Estandarte**: Boolean (true si compañía ≥ 10 criaturas)
   
@@ -58,9 +60,11 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
 
 #### FR-2.1: Ataque General
 - Unidad lanza **múltiples d20** según formación:
-  - Ataques disponibles = `frontWidth × rowsAttacking`
-  - Ejemplo: Frente 4, Filas 2 = 8 ataques
+  - Frente efectivo inicial ≤ `frente enemigo + 2`
+  - Si completa dos filas, puede extender el frente con criaturas sobrantes
+  - Ataques disponibles = min(`criaturesCount`, `frenteEfectivo × filasMaxAlcance`)
 - Cada ataque: `d20 + Bono de Ataque` vs CA del objetivo
+- Modificador adicional por formación: `+2` por cada fila ocupada desde la segunda
 - Impactos causan daño en HP (no más PF)
 
 #### FR-2.2: Daño de Unidad a Unidad
@@ -74,8 +78,16 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
 - Depth (profundidad) = `ceil(creaturesCount / frontWidth)`
 - `flankExposure` = min(depth, creaturesCount)
 - **Filas atacantes**:
-  - 2 filas si `reachFeet < 10`
-  - 3 filas si `reachFeet ≥ 10` (armas con alcance o criaturas grandes)
+  - 1 fila si `reachFeet <= 5`
+  - 2 filas si `reachFeet >= 10`
+  - 3 filas si `reachFeet >= 15`
+
+### FR-2.5: Turnos y Rondas
+- Un turno se compone de **dos rondas**:
+  1) ronda del equipo con mayor iniciativa viva,
+  2) ronda del equipo contrario.
+- Al inicio de batalla, cada combatiente tira iniciativa una sola vez: `1d20 + mod DEX`.
+- La unidad/personaje con mayor iniciativa viva define el equipo que abre el turno.
 
 #### FR-2.4: Daño a Personaje Individual
 - Unidad que impacta personaje le causa:
@@ -429,3 +441,8 @@ THEN: Mismo número, PF, posiciones, estados se restauran
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definición Inicial - 2026-02-08
+
+## Changelog Corto
+- 2026-02-22: Reglas de filas por alcance actualizadas a 5/10/15ft = 1/2/3.
+- 2026-02-22: Nuevo requisito de frente efectivo limitado por frente enemigo +2.
+- 2026-02-22: Añadidos bono por filas y estructura de turno con 2 rondas por turno.

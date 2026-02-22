@@ -2,7 +2,7 @@
 
 **Rol:** Lead Developer  
 **Responsabilidad:** Implementación, coding standards y especificaciones técnicas  
-**Versión:** 3.0 (Warhammer HP System)
+**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
 
 ---
 
@@ -32,6 +32,15 @@ Regla adicional para unidades v3.0:
   - Moral Warhammer (2-12) definido para cada CreatureType
   - Stats se muestran en CLI con `toStatsString()` actualizado
   - Stats se muestran en Web bajo nombre de unidad en selección
+
+Addendum técnico v3.1 (obligatorio):
+- [x] `rowsAttacking` por alcance: 5ft=1, 10ft=2, 15ft=3.
+- [x] Ataques de unidad deben calcularse contra el frente del enemigo (`getFormationProfileAgainst`).
+- [x] Tope inicial de frente atacante: `enemyFront + 2`.
+- [x] Si se completan 2 filas, el frente puede extenderse con criaturas sobrantes.
+- [x] Bono por filas ocupadas: `+2 * (filasOcupadas - 1)`.
+- [x] Tras cada `takeDamage`, se recalculan criaturas y formación antes del siguiente ataque.
+- [x] Iniciativa: tirada única por combatiente; turno = 2 rondas (equipos alternos).
 
 ### 1.1 Naming Conventions
 - **Clases**: PascalCase (`Character`, `BattleEngine`)
@@ -655,3 +664,8 @@ Cada clase debe:
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
+
+## Changelog Corto
+- 2026-02-22: DoD ampliado con validaciones técnicas de frente enemigo +2, bono por filas y recálculo tras bajas.
+- 2026-02-22: Regla de filas por alcance normalizada (5/10/15ft = 1/2/3).
+- 2026-02-22: Iniciativa y estructura de turno (2 rondas) añadidas como regla de implementación.

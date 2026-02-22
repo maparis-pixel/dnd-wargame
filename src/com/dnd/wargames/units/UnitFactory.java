@@ -60,6 +60,51 @@ public class UnitFactory {
     }
 
     /**
+     * Crea una unidad personalizada con estadísticas completas de D&D.
+     */
+    public static CombatUnit createCustomUnit(
+            String name,
+            int count,
+            int armorClass,
+            int hitPointsPerCreature,
+            String hitDiceFormula,
+            int speedFeet,
+            int reachFeet,
+            int baseAttackBonus,
+            int baseDamage,
+            int strength,
+            int dexterity,
+            int constitution,
+            int intelligence,
+            int wisdom,
+            int charisma,
+            int morale,
+            String primaryAttack,
+            String secondaryAttack,
+            String imagePath
+    ) {
+        CombatUnit unit = new CombatUnit(name, CreatureType.CUSTOM, count);
+        unit.setArmorClass(armorClass);
+        unit.setHitPointsPerCreature(hitPointsPerCreature);
+        unit.setHitDiceFormula(hitDiceFormula);
+        unit.setSpeedFeet(speedFeet);
+        unit.setReachFeet(reachFeet);
+        unit.setBaseAttackBonus(baseAttackBonus);
+        unit.setBaseDamage(baseDamage);
+        unit.setStrength(strength);
+        unit.setDexterity(dexterity);
+        unit.setConstitution(constitution);
+        unit.setIntelligence(intelligence);
+        unit.setWisdom(wisdom);
+        unit.setCharisma(charisma);
+        unit.setMorale(morale);
+        unit.setPrimaryAttack(primaryAttack);
+        unit.setSecondaryAttack(secondaryAttack);
+        unit.setImagePath(imagePath);
+        return unit;
+    }
+
+    /**
      * Crea un personaje guerrero básico.
      */
     public static Character createWarrior(String name, int level) {

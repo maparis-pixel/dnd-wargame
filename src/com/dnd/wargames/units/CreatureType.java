@@ -7,6 +7,7 @@ package com.dnd.wargames.units;
  * @version 2.0
  */
 public enum CreatureType {
+    CUSTOM("Personalizada"),
     GOBLIN("Trasgo"),
     ORC("Orco"),
     SKELETON("Esqueleto"),

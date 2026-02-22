@@ -35,8 +35,8 @@ public class SimpleTest {
         int rowsAttacking = orcs.getRowsAttacking();
         int attacksAvailable = orcs.getAttacksAvailable();
         
-        if (rowsAttacking != 2) { // Orcos tienen reach 5ft = 2 filas
-            System.out.println("❌ FAIL: rowsAttacking esperado 2, obtenido " + rowsAttacking);
+        if (rowsAttacking != 1) { // Reach 5ft = 1 fila
+            System.out.println("❌ FAIL: rowsAttacking esperado 1, obtenido " + rowsAttacking);
             System.exit(1);
         }
         if (attacksAvailable != frontWidth * rowsAttacking) {
@@ -79,16 +79,16 @@ public class SimpleTest {
         String result = passed ? "Pasa (mantiene posición)" : "Falla (huye)";
         System.out.println("✅ PASS: Chequeo moral " + result);
 
-        // Test 5: Ogre con reach 10ft = 3 filas
-        System.out.println("\nTest 5: Ogre con alcance 10ft (3 filas atacantes)");
+        // Test 5: Ogre con reach 10ft = 2 filas
+        System.out.println("\nTest 5: Ogre con alcance 10ft (2 filas atacantes)");
         CombatUnit ogres = UnitFactory.createOgres(5);
         
         if (ogres.getReachFeet() != 10) {
             System.out.println("❌ FAIL: Reach esperado 10ft, obtenido " + ogres.getReachFeet());
             System.exit(1);
         }
-        if (ogres.getRowsAttacking() != 3) {
-            System.out.println("❌ FAIL: rowsAttacking esperado 3, obtenido " + ogres.getRowsAttacking());
+        if (ogres.getRowsAttacking() != 2) {
+            System.out.println("❌ FAIL: rowsAttacking esperado 2, obtenido " + ogres.getRowsAttacking());
             System.exit(1);
         }
         System.out.println("✅ PASS: Ogre alcance " + ogres.getReachFeet() + "ft, " + ogres.getRowsAttacking() + " filas");

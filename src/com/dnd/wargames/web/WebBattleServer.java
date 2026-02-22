@@ -327,12 +327,38 @@ public class WebBattleServer {
         StringBuilder sb = new StringBuilder();
         sb.append("<ul>");
         for (CombatUnit unit : units) {
+            String imagePath = unit.getImagePath();
+            String imageSource = resolveImageSource(imagePath);
             sb.append("<li>")
-              .append(escapeHtml(unit.toStatsString()))
-              .append("</li>");
+              .append(escapeHtml(unit.toStatsString()));
+
+            if (imageSource != null) {
+                sb.append("<br><img src='")
+                  .append(escapeHtml(imageSource))
+                  .append("' alt='Imagen de ")
+                  .append(escapeHtml(unit.getName()))
+                  .append("' style='max-width:220px;max-height:220px;border:1px solid #ddd;margin-top:6px;'>");
+            }
+
+                        sb.append("</li>");
         }
         sb.append("</ul>");
         return sb.toString();
+    }
+
+    private String resolveImageSource(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return null;
+        }
+
+        String normalized = imagePath.trim();
+        String lower = normalized.toLowerCase();
+
+        if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("data:")) {
+            return normalized;
+        }
+
+        return "file:///" + normalized.replace("\\", "/");
     }
 
     private String escapeHtml(String text) {

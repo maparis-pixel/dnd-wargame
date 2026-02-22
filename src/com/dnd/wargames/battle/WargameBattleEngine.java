@@ -19,6 +19,7 @@ public class WargameBattleEngine {
 
     private List<Combatant> initiativeOrder;
     private boolean battleActive;
+    private int turnCounter;
 
     /**
      * Constructor del motor de batalla.
@@ -30,6 +31,7 @@ public class WargameBattleEngine {
         this.team2Units = new ArrayList<>();
         this.initiativeOrder = new ArrayList<>();
         this.battleActive = false;
+        this.turnCounter = 0;
     }
 
     /**
@@ -67,12 +69,14 @@ public class WargameBattleEngine {
         for (Character c : team2Characters) allCombatants.add(new Combatant(c, 2));
         for (CombatUnit u : team2Units) allCombatants.add(new Combatant(u, 2));
 
-        // Ordenar por iniciativa (d20 + DEX modifier)
-        allCombatants.sort((a, b) -> {
-            int initA = DiceRoller.rollInitiative(a.getDexterityModifier());
-            int initB = DiceRoller.rollInitiative(b.getDexterityModifier());
-            return Integer.compare(initB, initA); // Orden descendente
-        });
+        // Tirar iniciativa una sola vez por combatiente (d20 + DEX mod)
+        for (Combatant combatant : allCombatants) {
+            int initiative = DiceRoller.rollInitiative(combatant.getDexterityModifier());
+            combatant.setInitiativeScore(initiative);
+        }
+
+        // Ordenar por iniciativa descendente
+        allCombatants.sort((a, b) -> Integer.compare(b.getInitiativeScore(), a.getInitiativeScore()));
 
         initiativeOrder.addAll(allCombatants);
     }
@@ -107,39 +111,83 @@ public class WargameBattleEngine {
             return;
         }
 
+        initiativeOrder.removeIf(c -> !c.isAlive());
         if (initiativeOrder.isEmpty()) {
             endBattle();
             return;
         }
 
-        Combatant current = initiativeOrder.get(0);
-        System.out.println("\n🎯 Turno de: " + current.getName() + " (Equipo " + current.team + ")");
-
-        // Por ahora, ataque automático al primer enemigo disponible
-        Combatant target = findTargetFor(current);
-
-        if (target != null) {
-            executeAttack(current, target);
-        } else {
-            System.out.println("   No hay objetivos disponibles.");
-        }
-
-        // Remover combatientes muertos
-        initiativeOrder.removeIf(c -> !c.isAlive());
-
-        // Verificar fin de batalla
         if (!hasLivingCombatants(1) || !hasLivingCombatants(2)) {
             endBattle();
             return;
         }
 
-        // Rotar iniciativa
-        if (!initiativeOrder.isEmpty()) {
-            Combatant first = initiativeOrder.remove(0);
-            initiativeOrder.add(first);
+        turnCounter++;
+        System.out.println("\n══════════ TURNO " + turnCounter + " ══════════");
+
+        Combatant highestInitiativeAlive = initiativeOrder.stream()
+                .filter(Combatant::isAlive)
+                .findFirst()
+                .orElse(null);
+
+        if (highestInitiativeAlive == null) {
+            endBattle();
+            return;
+        }
+
+        int firstRoundTeam = highestInitiativeAlive.team;
+        int secondRoundTeam = (firstRoundTeam == 1) ? 2 : 1;
+
+        executeRoundForTeam(firstRoundTeam);
+
+        if (!battleActive || !hasLivingCombatants(1) || !hasLivingCombatants(2)) {
+            endBattle();
+            return;
+        }
+
+        executeRoundForTeam(secondRoundTeam);
+
+        initiativeOrder.removeIf(c -> !c.isAlive());
+
+        if (!hasLivingCombatants(1) || !hasLivingCombatants(2)) {
+            endBattle();
+            return;
         }
 
         showBattleStatus();
+    }
+
+    private void executeRoundForTeam(int team) {
+        String roundLabel = (team == 1) ? "Aliados" : "Enemigos";
+        System.out.println("\n🔁 Ronda de " + roundLabel + " (Equipo " + team + ")");
+
+        List<Combatant> roundOrder = new ArrayList<>();
+        for (Combatant combatant : initiativeOrder) {
+            if (combatant.team == team && combatant.isAlive()) {
+                roundOrder.add(combatant);
+            }
+        }
+
+        for (Combatant attacker : roundOrder) {
+            if (!attacker.isAlive() || !battleActive) {
+                continue;
+            }
+
+            Combatant target = findTargetFor(attacker);
+            System.out.println("🎯 Actúa: " + attacker.getName() + " (Ini " + attacker.getInitiativeScore() + ")");
+
+            if (target != null) {
+                executeAttack(attacker, target);
+            } else {
+                System.out.println("   No hay objetivos disponibles.");
+            }
+
+            initiativeOrder.removeIf(c -> !c.isAlive());
+
+            if (!hasLivingCombatants(1) || !hasLivingCombatants(2)) {
+                return;
+            }
+        }
     }
 
     /**
@@ -232,7 +280,7 @@ public class WargameBattleEngine {
         for (int i = 0; i < initiativeOrder.size(); i++) {
             Combatant c = initiativeOrder.get(i);
             String marker = (i == 0) ? " → " : "   ";
-            System.out.println(marker + c.getName() + " (Equipo " + c.team + ")");
+            System.out.println(marker + c.getName() + " (Equipo " + c.team + ", Ini " + c.getInitiativeScore() + ")");
         }
         System.out.println();
     }
@@ -277,6 +325,7 @@ public class WargameBattleEngine {
         public final Character character;
         public final CombatUnit unit;
         public final int team;
+        private int initiativeScore;
 
         public Combatant(Character character, int team) {
             this.character = character;
@@ -305,8 +354,16 @@ public class WargameBattleEngine {
             if (isCharacter()) {
                 return character.getAbilityModifier(character.getDexterity());
             } else {
-                return unit.getDexterity() / 2; // Simplificado
+                return (unit.getDexterity() - 10) / 2;
             }
+        }
+
+        public int getInitiativeScore() {
+            return initiativeScore;
+        }
+
+        public void setInitiativeScore(int initiativeScore) {
+            this.initiativeScore = initiativeScore;
         }
     }
 }

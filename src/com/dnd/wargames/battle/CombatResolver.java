@@ -25,19 +25,26 @@ public class CombatResolver {
             return new AttackResult(false, 0, 0, 0);
         }
 
-        // Calcular número de ataques disponibles por formación
-        int attacksAvailable = attacker.getAttacksAvailable();
+        CombatUnit.FormationProfile attackerFormation =
+                attacker.getFormationProfileAgainst(defender.getFrontWidth());
+
+        int attacksAvailable = attackerFormation.attacksAvailable;
+        int attackBonusByRows = attackerFormation.rowAttackBonus;
         int totalDamage = 0;
         int hits = 0;
 
         System.out.println("🎲 " + attacker.getName() + " ataca a " + defender.getName());
         System.out.println("   Ataques disponibles: " + attacksAvailable + 
-                          " (Frente " + attacker.getFrontWidth() + 
-                          " × Filas " + attacker.getRowsAttacking() + ")");
+                          " (Frente " + attackerFormation.effectiveFrontWidth + 
+                          " × Filas " + attackerFormation.occupiedAttackingRows +
+                          "/" + attackerFormation.maxAttackRows + ")");
+        if (attackBonusByRows > 0) {
+            System.out.println("   Bono por filas: +" + attackBonusByRows);
+        }
 
         for (int i = 0; i < attacksAvailable; i++) {
             // Tirada de ataque: d20 + attack bonus
-            int attackRoll = DiceRoller.rollD20() + attacker.getBaseAttackBonus();
+            int attackRoll = DiceRoller.rollD20() + attacker.getBaseAttackBonus() + attackBonusByRows;
 
             if (attackRoll >= defender.getArmorClass()) {
                 // Impacto exitoso - daño base del atacante
@@ -116,16 +123,23 @@ public class CombatResolver {
             return new AttackResult(false, 0, 0, 0);
         }
 
-        // Calcular número de ataques disponibles por formación
-        int attacksAvailable = attacker.getAttacksAvailable();
+        CombatUnit.FormationProfile attackerFormation = attacker.getFormationProfileAgainst(1);
+        int attacksAvailable = attackerFormation.attacksAvailable;
+        int attackBonusByRows = attackerFormation.rowAttackBonus;
         int totalDamage = 0;
         int hits = 0;
 
         System.out.println("👥 " + attacker.getName() + " ataca a " + defender.getName());
-        System.out.println("   Ataques disponibles: " + attacksAvailable);
+        System.out.println("   Ataques disponibles: " + attacksAvailable +
+                          " (Frente " + attackerFormation.effectiveFrontWidth +
+                          ", Filas " + attackerFormation.occupiedAttackingRows +
+                          "/" + attackerFormation.maxAttackRows + ")");
+        if (attackBonusByRows > 0) {
+            System.out.println("   Bono por filas: +" + attackBonusByRows);
+        }
 
         for (int i = 0; i < attacksAvailable; i++) {
-            int attackRoll = DiceRoller.rollD20() + attacker.getBaseAttackBonus();
+            int attackRoll = DiceRoller.rollD20() + attacker.getBaseAttackBonus() + attackBonusByRows;
 
             if (attackRoll >= defender.getArmorClass()) {
                 int damage = attacker.getBaseDamage();

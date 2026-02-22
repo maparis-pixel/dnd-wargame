@@ -383,34 +383,96 @@ public class CommandLineInterface {
         System.out.println("3. Trasgos");
         System.out.println("4. Esqueletos");
         System.out.println("5. Ogros");
-        System.out.print("Elige tipo (1-5): ");
+        System.out.println("6. Unidad personalizada (D&D/5etools)");
+        System.out.print("Elige tipo (1-6): ");
 
         int typeChoice = Integer.parseInt(scanner.nextLine().trim());
-        System.out.print("Cantidad de criaturas: ");
-        int count = Integer.parseInt(scanner.nextLine().trim());
 
-        CombatUnit unit = null;
+        CombatUnit unit;
+        if (typeChoice == 6) {
+            System.out.print("Nombre de la unidad: ");
+            String name = scanner.nextLine().trim();
+            int count = promptInt("Cantidad de criaturas", 1, 500, 10);
+            int armorClass = promptInt("AC", 1, 30, 13);
+            int hitPointsPerCreature = promptInt("HP por criatura", 1, 999, 10);
+            System.out.print("Fórmula de dados HP (ej: 2d8+2): ");
+            String hitDiceFormula = scanner.nextLine().trim();
+            if (hitDiceFormula.isBlank()) {
+                hitDiceFormula = "2d8";
+            }
+            int speedFeet = promptInt("Velocidad (ft)", 5, 120, 30);
+            int reachFeet = promptInt("Alcance (ft)", 5, 30, 5);
+            int baseAttackBonus = promptInt("Bono de ataque", -5, 20, 3);
+            int baseDamage = promptInt("Daño base", 1, 100, 6);
+            int strength = promptInt("STR", 1, 30, 10);
+            int dexterity = promptInt("DEX", 1, 30, 10);
+            int constitution = promptInt("CON", 1, 30, 10);
+            int intelligence = promptInt("INT", 1, 30, 10);
+            int wisdom = promptInt("WIS", 1, 30, 10);
+            int charisma = promptInt("CHA", 1, 30, 10);
+            int morale = promptInt("Moral Warhammer (2-12)", 2, 12, 7);
 
-        switch (typeChoice) {
-            case 1:
-                unit = UnitFactory.createHumanGuards(count);
-                break;
-            case 2:
-                unit = UnitFactory.createOrcs(count);
-                break;
-            case 3:
-                unit = UnitFactory.createGoblins(count);
-                break;
-            case 4:
-                unit = UnitFactory.createSkeletons(count);
-                break;
-            case 5:
-                unit = UnitFactory.createOgres(count);
-                break;
-            default:
-                System.out.println("Opción inválida.");
-                showMainMenu();
-                return;
+            System.out.print("Ataque principal (texto): ");
+            String primaryAttack = scanner.nextLine().trim();
+            if (primaryAttack.isBlank()) {
+                primaryAttack = "Ataque personalizado";
+            }
+
+            System.out.print("Ataque secundario (texto): ");
+            String secondaryAttack = scanner.nextLine().trim();
+            if (secondaryAttack.isBlank()) {
+                secondaryAttack = "Sin ataque secundario";
+            }
+
+            System.out.print("Ruta o URL de imagen (5etools u otra, opcional): ");
+            String imagePath = scanner.nextLine().trim();
+
+            unit = UnitFactory.createCustomUnit(
+                    name,
+                    count,
+                    armorClass,
+                    hitPointsPerCreature,
+                    hitDiceFormula,
+                    speedFeet,
+                    reachFeet,
+                    baseAttackBonus,
+                    baseDamage,
+                    strength,
+                    dexterity,
+                    constitution,
+                    intelligence,
+                    wisdom,
+                    charisma,
+                    morale,
+                    primaryAttack,
+                    secondaryAttack,
+                    imagePath
+            );
+        } else {
+            System.out.print("Cantidad de criaturas: ");
+            int count = Integer.parseInt(scanner.nextLine().trim());
+
+            switch (typeChoice) {
+                case 1:
+                    unit = UnitFactory.createHumanGuards(count);
+                    break;
+                case 2:
+                    unit = UnitFactory.createOrcs(count);
+                    break;
+                case 3:
+                    unit = UnitFactory.createGoblins(count);
+                    break;
+                case 4:
+                    unit = UnitFactory.createSkeletons(count);
+                    break;
+                case 5:
+                    unit = UnitFactory.createOgres(count);
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+                    showMainMenu();
+                    return;
+            }
         }
 
         units.add(unit);
@@ -479,10 +541,32 @@ public class CommandLineInterface {
         System.out.println("- Trasgos: Numerosos, débiles individualmente");
         System.out.println("- Esqueletos: No tienen moral, pero son frágiles");
         System.out.println("- Ogros: Muy fuertes, alta dureza");
+        System.out.println("- Personalizada: stats D&D + ruta/URL de imagen (incluye 5etools)");
         System.out.println();
         System.out.println("Presiona Enter para continuar...");
         scanner.nextLine();
         showMainMenu();
+    }
+
+    private int promptInt(String label, int min, int max, int defaultValue) {
+        while (true) {
+            System.out.print(label + " [" + min + "-" + max + "] (default " + defaultValue + "): ");
+            String raw = scanner.nextLine().trim();
+            if (raw.isBlank()) {
+                return defaultValue;
+            }
+
+            try {
+                int value = Integer.parseInt(raw);
+                if (value < min || value > max) {
+                    System.out.println("❌ Valor fuera de rango.");
+                    continue;
+                }
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Número inválido.");
+            }
+        }
     }
 
     /**

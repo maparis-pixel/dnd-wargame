@@ -125,6 +125,89 @@ public class BasicTest {
             allTestsPassed = false;
         }
 
+        // Test 6: Regla de frente enemigo +2 y recálculo tras bajas
+        System.out.println("\nTest 6: Frente enemigo +2 y recálculo");
+        try {
+            CombatUnit atacante = UnitFactory.createOrcs(7); // Reach 5ft -> 1 fila
+            CombatUnit defensor = UnitFactory.createHumanGuards(3); // frente esperado 2
+
+            CombatUnit.FormationProfile profileInicial = atacante.getFormationProfileAgainst(defensor.getFrontWidth());
+
+            if (defensor.getFrontWidth() != 2) {
+                throw new IllegalStateException("Frente del defensor esperado 2, obtenido " + defensor.getFrontWidth());
+            }
+            if (profileInicial.effectiveFrontWidth != 4) { // 2 + 2
+                throw new IllegalStateException("Frente efectivo esperado 4, obtenido " + profileInicial.effectiveFrontWidth);
+            }
+            if (profileInicial.attacksAvailable != 4) {
+                throw new IllegalStateException("Ataques esperados 4, obtenido " + profileInicial.attacksAvailable);
+            }
+
+            atacante.takeDamage(30); // 2 orcos menos -> 5 criaturas
+            CombatUnit.FormationProfile profileTrasBajas = atacante.getFormationProfileAgainst(defensor.getFrontWidth());
+
+            if (profileTrasBajas.attacksAvailable != 4) {
+                throw new IllegalStateException("Tras bajas, ataques esperados 4, obtenido " + profileTrasBajas.attacksAvailable);
+            }
+
+            System.out.println("✅ Frente +2 aplicado correctamente y recálculo tras bajas OK");
+        } catch (Exception e) {
+            System.out.println("❌ Error en regla de frente enemigo +2: " + e.getMessage());
+            e.printStackTrace();
+            allTestsPassed = false;
+        }
+
+        // Test 7: Bono por filas y alcance 15ft
+        System.out.println("\nTest 7: Bono por filas y alcance");
+        try {
+            CombatUnit atacante10 = UnitFactory.createOgres(10); // Reach 10ft -> max 2 filas
+            CombatUnit defensor10 = UnitFactory.createOrcs(10);
+
+            CombatUnit.FormationProfile profile10 = atacante10.getFormationProfileAgainst(defensor10.getFrontWidth());
+            if (profile10.maxAttackRows != 2) {
+                throw new IllegalStateException("Con reach 10ft se esperaban 2 filas máximas, obtenido " + profile10.maxAttackRows);
+            }
+            if (profile10.occupiedAttackingRows < 2) {
+                throw new IllegalStateException("Se esperaban al menos 2 filas ocupadas, obtenido " + profile10.occupiedAttackingRows);
+            }
+            if (profile10.rowAttackBonus != 2) {
+                throw new IllegalStateException("Bono por filas esperado +2, obtenido +" + profile10.rowAttackBonus);
+            }
+
+            CombatUnit atacante15 = UnitFactory.createCustomUnit(
+                    "Piqueros Largos",
+                    12,
+                    13,
+                    10,
+                    "2d8",
+                    30,
+                    15,
+                    4,
+                    6,
+                    12,
+                    12,
+                    12,
+                    10,
+                    10,
+                    10,
+                    7,
+                    "Pica larga",
+                    "Sin ataque secundario",
+                    ""
+            );
+
+            CombatUnit.FormationProfile profile15 = atacante15.getFormationProfileAgainst(defensor10.getFrontWidth());
+            if (atacante15.getRowsAttacking() != 3 || profile15.maxAttackRows != 3) {
+                throw new IllegalStateException("Con reach 15ft se esperaban 3 filas máximas");
+            }
+
+            System.out.println("✅ Bono por filas y escalado de alcance (10ft/15ft) validados");
+        } catch (Exception e) {
+            System.out.println("❌ Error en bono por filas/alcance: " + e.getMessage());
+            e.printStackTrace();
+            allTestsPassed = false;
+        }
+
         // Resumen final
         System.out.println("\n================================================");
         if (allTestsPassed) {

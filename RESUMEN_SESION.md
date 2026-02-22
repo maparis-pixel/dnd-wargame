@@ -1,8 +1,8 @@
 # D&D Wargames - Resumen de Sesión
-## Fecha: 21 de Febrero de 2026
+## Fecha: 22 de Febrero de 2026
 
 ## 🎯 OBJETIVO ALCANZADO
-Sistema D&D Wargames completamente funcional con combate asimétrico Personaje vs Unidades.
+Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizadas y validadas.
 
 ## ✅ LO QUE SE COMPLETÓ
 
@@ -22,6 +22,21 @@ Sistema D&D Wargames completamente funcional con combate asimétrico Personaje v
    - DiceRoller: Dados con ventaja/desventaja
    - CombatResolver: Resolución asimétrica de combate
    - WargameBattleEngine: Motor de turnos e iniciativa
+
+### Avances de esta sesión (22-02-2026)
+- ✅ Filas por alcance actualizadas:
+   - 5ft = 1 fila
+   - 10ft = 2 filas
+   - 15ft = 3 filas
+- ✅ Ataques de unidad dependientes del frente enemigo:
+   - frente efectivo inicial limitado a `frente enemigo + 2`
+   - extensión de frente si la unidad completa dos filas
+- ✅ Bono por filas aplicado al ataque: `+2` por fila adicional desde la segunda
+- ✅ Re-cálculo dinámico tras bajas en el mismo combate
+- ✅ Turno redefinido: 2 rondas (aliados y enemigos)
+- ✅ Iniciativa corregida: `1d20 + mod DEX` tirada única por combatiente
+- ✅ Tests ampliados (`BasicTest`) para frente +2, recálculo y bono por filas
+- ✅ Documentación de perfiles y requisitos sincronizada con estado real
 
 3. **Interfaz (cli/)**
    - CommandLineInterface: Menú interactivo completo
@@ -82,4 +97,4 @@ Sistema D&D Wargames completamente funcional con combate asimétrico Personaje v
 
 ---
 **Estado**: PROYECTO COMPLETAMENTE FUNCIONAL Y LISTO PARA EXPANSIÓN
-**Última ejecución**: SimpleTest exitoso (exit code 0)
+**Última ejecución**: run_tests.bat exitoso (SimpleTest, BasicTest, MoraleAndWebSmokeTest y CombatDemo)

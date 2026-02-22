@@ -2,7 +2,7 @@
 
 **Rol:** Test Lead / QA Lead  
 **Responsabilidad:** Estrategia de testing, casos de prueba y validación  
-**Versión:** 3.0 (Warhammer HP System)
+**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
 
 ---
 
@@ -36,9 +36,17 @@ Cobertura mínima adicional de dominio v3.0:
 - Validar que unidades base conserven estadísticas correctas:
   - **HP/criatura**, **AC**, **Ataque**, **Daño**, **Moral Warhammer (2-12)**
   - **Alcance** (5ft estándar, 10ft Ogre)
-  - **Formación**: `frontWidth`, `rowsAttacking` (2 o 3 según reach)
+  - **Formación**: `frontWidth`, `rowsAttacking` (5ft=1, 10ft=2, 15ft=3)
 - Validar `getAttacksAvailable()` = frontWidth × rowsAttacking
 - Validar `checkMorale(2d6)` con triggers: porta estandarte, 50% HP
+
+Cobertura adicional obligatoria v3.1:
+- Validar `getFormationProfileAgainst(enemyFront)`:
+  - frente efectivo inicial limitado a `enemyFront + 2`
+  - extensión de frente al completar dos filas
+  - recálculo tras bajas en el mismo combate
+- Validar bono por filas ocupadas: +2 por fila desde la segunda.
+- Validar modelo de turno del motor: 1 turno = ronda de aliados + ronda de enemigos.
 
 ---
 
@@ -639,3 +647,8 @@ Additional Notes:
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08
+
+## Changelog Corto
+- 2026-02-22: Cobertura QA actualizada para validar frente enemigo +2 y recálculo por bajas.
+- 2026-02-22: Añadida validación de bono por filas (+2 por fila desde la segunda).
+- 2026-02-22: Validación del modelo de turno por 2 rondas incorporada al gate funcional.

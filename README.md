@@ -1,10 +1,10 @@
 # D&D Wargames - Simulador de Combate a Escala de Batallón
 
-**Versión**: 2.0 (Wargame Scale)  
+**Versión**: 3.1 (Wargame Scale)  
 **Interfaz**: CLI + Web
 **Estado**: ✅ **COMPLETAMENTE FUNCIONAL**
 
-## 📊 Estado Actual del Proyecto (21 Feb 2026)
+## 📊 Estado Actual del Proyecto (22 Feb 2026)
 
 ### ✅ **Sistema Completamente Implementado**
 - **Código compilado** ✓
@@ -17,10 +17,14 @@
 - ⚔️ Sistema de combate asimétrico (Personaje vs Unidades)
 - 🎲 Motor de dados con ventaja/desventaja
 - 👥 Fábrica de unidades (Guardias, Orcos, Guerreros, Magos)
-- 🏰 Batallas por turnos con iniciativa
+- 🏰 Batallas por turnos de 2 rondas (aliados/enemigos) con iniciativa real
 - 💻 Interfaz de comandos completa
 - 📋 Bloque detallado de estadísticas de unidad (CLI y Web)
 - 🧪 Suite de tests automatizados
+- 📐 Reglas de formación actualizadas:
+  - alcance 5ft/10ft/15ft ⇒ 1/2/3 filas atacantes
+  - frente de ataque limitado por frente enemigo +2 (con extensión si completa 2 filas)
+  - bono por filas ocupadas: +2 por fila adicional
 
 ### 📁 **Archivos Clave**
 - `src/com/dnd/wargames/` - Código fuente completo

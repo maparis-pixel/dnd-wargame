@@ -1,23 +1,23 @@
 @echo off
-echo Compilando D&D Wargames...
+chcp 65001 > nul
+echo Compilando D^&D Wargames...
 echo ==============================
 
-REM Compilar todas las clases
-javac -d bin -cp . src/com/dnd/wargames/units/*.java
-javac -d bin -cp . src/com/dnd/wargames/battle/*.java
-javac -d bin -cp . src/com/dnd/wargames/cli/*.java
-javac -d bin -cp . src/com/dnd/wargames/web/*.java
-javac -d bin -cp . src/com/dnd/wargames/demo/*.java
-javac -d bin -cp . src/com/dnd/wargames/test/*.java
-javac -d bin -cp . src/com/dnd/wargames/DndWargames.java
+REM Asegurar carpeta bin
+if not exist bin mkdir bin
+
+REM Compilar todas las clases en una sola pasada
+dir /s /b src\com\dnd\wargames\*.java > .sources.list
+javac -d bin @.sources.list
+del .sources.list
 
 if %errorlevel% neq 0 (
-    echo ❌ Error de compilación
+    echo [ERROR] Error de compilacion
     pause
     exit /b 1
 )
 
-echo ✅ Compilación exitosa
+echo [OK] Compilacion exitosa
 echo.
 echo Ejecutando tests...
 echo ===================
@@ -38,5 +38,5 @@ echo Ejecutando CombatDemo...
 java -cp bin com.dnd.wargames.demo.CombatDemo
 
 echo.
-echo ✅ Todos los tests completados
+echo [OK] Todos los tests completados
 pause

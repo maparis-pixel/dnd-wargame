@@ -12,6 +12,7 @@ public class CombatUnit {
     private String id;
     private String name;            // Ej: "Compañía de 15 Trasgos"
     private CreatureType creatureType;    // GOBLIN, SKELETON, ORC, etc
+    private String imagePath;       // Ruta local o URL (ej: 5etools)
 
     // Puntos de Golpe (HP) - Sistema por compañía
     private int hitPoints;          // HP actual (suma total de la compañía)
@@ -38,7 +39,7 @@ public class CombatUnit {
     // Formación (Warhammer-style)
     private int frontWidth;         // Ancho del frente (criaturas)
     private int flankExposure;      // Exposición de flancos (criaturas)
-    private int rowsAttacking;      // Filas que pueden atacar (2 base, 3 si reach 10ft)
+    private int rowsAttacking;      // Filas máximas que pueden atacar según alcance
 
     // Moral Warhammer
     private MoraleEffect moraleStatus;  // NONE, FRIGHTENED, CONFUSED, RAGING
@@ -53,6 +54,7 @@ public class CombatUnit {
         this.id = java.util.UUID.randomUUID().toString();
         this.name = name;
         this.creatureType = creatureType;
+        this.imagePath = "";
         this.creaturesCount = creaturesCount;
 
         // Valores por defecto según el tipo de criatura
@@ -79,6 +81,7 @@ public class CombatUnit {
         this.id = java.util.UUID.randomUUID().toString();
         this.name = name;
         this.creatureType = creatureType;
+        this.imagePath = "";
         this.creaturesCount = creaturesCount;
 
         this.armorClass = armorClass;
@@ -101,7 +104,7 @@ public class CombatUnit {
     }
 
     /**
-     * Calcula la formación de la unidad (frente, flancos, filas atacantes).
+    * Calcula la formación de la unidad (frente, flancos, filas atacantes).
      * Por defecto: cuadrado o rectángulo aproximado según tamaño.
      */
     private void calculateFormation() {
@@ -118,8 +121,19 @@ public class CombatUnit {
         int depth = (int) Math.ceil((double) creaturesCount / frontWidth);
         this.flankExposure = Math.min(depth, creaturesCount);
 
-        // Rows attacking: 2 base, 3 si reach >= 10ft
-        this.rowsAttacking = (reachFeet >= 10) ? 3 : 2;
+        // Filas atacantes por alcance:
+        // 5ft -> 1 fila, 10ft -> 2 filas, 15ft+ -> 3 filas
+        this.rowsAttacking = getMaxRowsByReach();
+    }
+
+    private int getMaxRowsByReach() {
+        if (reachFeet >= 15) {
+            return 3;
+        }
+        if (reachFeet >= 10) {
+            return 2;
+        }
+        return 1;
     }
 
     /**
@@ -240,11 +254,93 @@ public class CombatUnit {
     }
 
     /**
-     * Calcula el número de ataques disponibles según formación.
-     * Base: frontWidth * rowsAttacking
+     * Calcula el número de ataques disponibles según formación actual.
+     * Tiene en cuenta solo criaturas existentes y filas alcanzables.
      */
     public int getAttacksAvailable() {
-        return frontWidth * rowsAttacking;
+        if (frontWidth <= 0 || creaturesCount <= 0 || rowsAttacking <= 0) {
+            return 0;
+        }
+        return Math.min(creaturesCount, frontWidth * rowsAttacking);
+    }
+
+    /**
+     * Calcula la formación de ataque efectiva contra un frente enemigo concreto.
+     *
+     * Regla de frente:
+     * - Máximo frente enemigo + 2 criaturas.
+     * - Si puede completar dos filas, puede extender el frente con las criaturas sobrantes.
+     */
+    public FormationProfile getFormationProfileAgainst(int enemyFrontWidth) {
+        if (creaturesCount <= 0) {
+            return new FormationProfile(0, 0, 0, 0, rowsAttacking, 0, 0);
+        }
+
+        int sanitizedEnemyFront = Math.max(1, enemyFrontWidth);
+        int cappedFront = Math.min(creaturesCount, sanitizedEnemyFront + 2);
+
+        int effectiveFront = cappedFront;
+        if (cappedFront > 0 && creaturesCount >= cappedFront * 2) {
+            int extraCreatures = creaturesCount - (cappedFront * 2);
+            effectiveFront = Math.min(creaturesCount, cappedFront + extraCreatures);
+        }
+
+        int maxAttackRows = getMaxRowsByReach();
+        int attacksAvailable = Math.min(creaturesCount, effectiveFront * maxAttackRows);
+
+        int fullRows = effectiveFront > 0 ? (creaturesCount / effectiveFront) : 0;
+        int partialRowCreatures = effectiveFront > 0 ? (creaturesCount % effectiveFront) : 0;
+
+        int occupiedAttackingRows = Math.min(maxAttackRows, fullRows);
+        if (occupiedAttackingRows < maxAttackRows && partialRowCreatures > 0) {
+            occupiedAttackingRows++;
+        }
+
+        if (attacksAvailable > 0 && occupiedAttackingRows == 0) {
+            occupiedAttackingRows = 1;
+        }
+
+        int rowAttackBonus = Math.max(0, occupiedAttackingRows - 1) * 2;
+
+        return new FormationProfile(
+                effectiveFront,
+                attacksAvailable,
+                occupiedAttackingRows,
+                rowAttackBonus,
+                maxAttackRows,
+                fullRows,
+                partialRowCreatures
+        );
+    }
+
+    public int getAttacksAvailableAgainst(int enemyFrontWidth) {
+        return getFormationProfileAgainst(enemyFrontWidth).attacksAvailable;
+    }
+
+    public static class FormationProfile {
+        public final int effectiveFrontWidth;
+        public final int attacksAvailable;
+        public final int occupiedAttackingRows;
+        public final int rowAttackBonus;
+        public final int maxAttackRows;
+        public final int fullRows;
+        public final int partialRowCreatures;
+
+        public FormationProfile(int effectiveFrontWidth,
+                                int attacksAvailable,
+                                int occupiedAttackingRows,
+                                int rowAttackBonus,
+                                int maxAttackRows,
+                                int fullRows,
+                                int partialRowCreatures) {
+            this.effectiveFrontWidth = effectiveFrontWidth;
+            this.attacksAvailable = attacksAvailable;
+            this.occupiedAttackingRows = occupiedAttackingRows;
+            this.rowAttackBonus = rowAttackBonus;
+            this.maxAttackRows = maxAttackRows;
+            this.fullRows = fullRows;
+            this.partialRowCreatures = partialRowCreatures;
+        }
     }
 
     /**
@@ -330,6 +426,7 @@ public class CombatUnit {
     public String getId() { return id; }
     public String getName() { return name; }
     public CreatureType getCreatureType() { return creatureType; }
+    public String getImagePath() { return imagePath; }
     public int getHitPoints() { return hitPoints; }
     public int getMaxHitPoints() { return maxHitPoints; }
     public int getCreaturesCount() { return creaturesCount; }
@@ -358,6 +455,7 @@ public class CombatUnit {
 
     // Setters
     public void setName(String name) { this.name = name; }
+    public void setImagePath(String imagePath) { this.imagePath = (imagePath == null) ? "" : imagePath.trim(); }
     public void setArmorClass(int armorClass) { this.armorClass = armorClass; }
     public void setBaseAttackBonus(int baseAttackBonus) { this.baseAttackBonus = baseAttackBonus; }
     public void setBaseDamage(int baseDamage) { this.baseDamage = baseDamage; }
@@ -367,11 +465,19 @@ public class CombatUnit {
     public void setIntelligence(int intelligence) { this.intelligence = intelligence; }
     public void setWisdom(int wisdom) { this.wisdom = wisdom; }
     public void setCharisma(int charisma) { this.charisma = charisma; }
-    public void setHitPointsPerCreature(int hitPointsPerCreature) { 
+    public void setHitPointsPerCreature(int hitPointsPerCreature) {
+        int oldMaxHitPoints = this.maxHitPoints;
         this.hitPointsPerCreature = hitPointsPerCreature;
-        // Recalcular HP total si cambia HP individual
-        this.hitPoints = Math.min(hitPoints, creaturesCount * hitPointsPerCreature);
         this.maxHitPoints = creaturesCount * hitPointsPerCreature;
+
+        if (oldMaxHitPoints <= 0 || hitPoints <= 0) {
+            this.hitPoints = this.maxHitPoints;
+            return;
+        }
+
+        double healthRatio = (double) hitPoints / (double) oldMaxHitPoints;
+        int recalculatedHitPoints = (int) Math.ceil(this.maxHitPoints * healthRatio);
+        this.hitPoints = Math.max(0, Math.min(this.maxHitPoints, recalculatedHitPoints));
     }
     public void setHitDiceFormula(String hitDiceFormula) { this.hitDiceFormula = hitDiceFormula; }
     public void setSpeedFeet(int speedFeet) { this.speedFeet = speedFeet; }
@@ -388,7 +494,7 @@ public class CombatUnit {
     public void setHasStandardBearer(boolean hasStandardBearer) { this.hasStandardBearer = hasStandardBearer; }
 
     public String toStatsString() {
-        return String.format(
+        String stats = String.format(
                 "%s | HP %d/%d (%d criaturas) | AC %d | HP/criatura %d (%s) | Vel %d ft | Alcance %d ft | " +
                 "Formación: Frente %d, Flancos %d, Filas ataque %d | " +
                 "STR %d DEX %d CON %d INT %d WIS %d CHA %d | " +
@@ -417,6 +523,12 @@ public class CombatUnit {
                 moraleStatus,
                 hasStandardBearer ? "Sí" : "No"
         );
+
+        if (imagePath != null && !imagePath.isBlank()) {
+            stats = stats + " | Imagen: " + imagePath;
+        }
+
+        return stats;
     }
 
     @Override
