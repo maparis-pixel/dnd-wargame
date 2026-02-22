@@ -1,29 +1,37 @@
 # D&D Wargames - Developer Specification
 
 **Rol:** Lead Developer  
-**Responsabilidad:** Implementación, coding standards y especificaciones técnicas
+**Responsabilidad:** Implementación, coding standards y especificaciones técnicas  
+**Versión:** 3.0 (Warhammer HP System)
 
 ---
 
 ## 1. Estándares de Código
 
-### 1.0 Protocolo de Iteración Obligatorio (DoD)
+### 1.0 Protocolo de Iteración Obligatorio (DoD) - v3.0
 
 Para cada cambio funcional o técnico:
 
-1. Actualizar documentación de rol y requisitos impactados (`docs/*.md`).
-2. Compilar proyecto completo.
-3. Ejecutar validación mínima obligatoria:
+1. **Actualizar documentación** de rol y requisitos impactados (`docs/*.md`).
+2. **Compilar proyecto** completo: `Compile D&D Wargames` task.
+3. **Ejecutar validación mínima obligatoria** (tests actualizados a HP system):
     - `java -cp src com.dnd.wargames.test.SimpleTest`
     - `java -cp src com.dnd.wargames.test.BasicTest`
-    - `java -cp src com.dnd.wargames.test.MoraleAndWebSmokeTest`
-4. No cerrar iteración si hay fallos.
+    - `java -cp src com.dnd.wargames.test.MoraleAndWebSmokeTest` (actualizado a 2d6)
+4. **No cerrar iteración si hay fallos.**
 
 Checklist mínimo por PR/iteración:
-- [ ] Código compila
-- [ ] Tests mínimos pasan
-- [ ] Specs de rol actualizados
-- [ ] Cambios funcionales reflejados en `REQUIREMENTS.md` y `README.md`
+- [x] Código compila
+- [x] Tests mínimos pasan (HP system + formación)
+- [x] Specs de rol actualizados (ARCHITECT, DEVELOPER, TEST_LEADER)
+- [x] Cambios funcionales reflejados en `REQUIREMENTS.md`
+
+Regla adicional para unidades v3.0:
+- [x] Si se tocan plantillas de unidad (`CombatUnit` / `UnitFactory`), validar:
+  - `hitPoints`, `creaturesCount`, `frontWidth`, `rowsAttacking` correctos
+  - Moral Warhammer (2-12) definido para cada CreatureType
+  - Stats se muestran en CLI con `toStatsString()` actualizado
+  - Stats se muestran en Web bajo nombre de unidad en selección
 
 ### 1.1 Naming Conventions
 - **Clases**: PascalCase (`Character`, `BattleEngine`)

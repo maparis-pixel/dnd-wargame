@@ -1,21 +1,27 @@
 # D&D Wargames - Requisitos Funcionales
 
-**Estado:** Actualizado - Wargame Scale  
-**Versión:** 2.0  
-**Fecha:** 2026-02-08
+**Estado:** Actualizado - Warhammer HP System  
+**Versión:** 3.0  
+**Fecha:** 2026-02-09
 
 ---
 
 ## 0. Visión General del Sistema
 
-El juego es un simulador de combate a **escala de batallón** (wargames) con dos tipos de unidades:
+El juego es un simulador de combate a **escala de batallón** (wargames) con mecánicas híbridas D&D + Warhammer:
 
+### Tipos de Unidades:
 1. **Personajes Individuales**: Héroes únicos (Guerreros, Magos, Clérigos) que actúan solos
-2. **Unidades de Combate**: Grupos de monstruos (30 trasgos, 20 esqueletos) representados como un único símbolo con **Puntos de Fuerza (PF)**
+2. **Unidades de Combate**: Compañías de criaturas con **HP total por compañía** (suma de HP individuales)
+
+### Mecánicas Clave (v3.0 - Sistema Warhammer):
+- **HP por Compañía**: En lugar de PF, cada compañía tiene HP = (criaturas × HP individual)
+- **Formación**: Frente, flancos, filas atacantes (2 base, 3 si alcance 10ft)
+- **Multi-ataques**: Ataques disponibles = FrenteWidth × FilasAtacantes
+- **Moral Warhammer**: Chequeo 2d6 vs valor de moral (2-12) cuando porta estandarte cae o 50% de bajas
+- **Huida**: Si falla moral, la unidad huye del combate
 
 ---
-
-## 1. Requisitos Funcionales (FR)
 
 ## 1. Requisitos Funcionales (FR)
 
@@ -28,75 +34,69 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con dos
 - Soportar clases: Guerrero, Mago, Clérigo, Bardo, Pícaro
 - Soportar habilidades especiales por clase
 
-#### FR-1.2: Unidades de Combate
-- Crear unidad de monstruos con:
-  - **Puntos de Fuerza (PF)**: Número de criaturas en la unidad
-  - **Tipo de Criatura**: Trasgo, Esqueleto, Ogro, etc.
-  - **Clase de Armadura (CA)**: Umbral de defensa
+#### FR-1.2: Unidades de Combate (Sistema v3.0)
+- Crear unidad de criaturas con:
+  - **Hit Points (HP)**: HP total de la compañía = criaturas × HP individual
+  - **Criaturas Count**: Número de criaturas en la compañía
+  - **Tipo de Criatura**: Trasgo, Esqueleto, Ogre, Guardia Humano, Orco
+  - **Clase de Armadura (CA)**: Umbral de defensa (AC individual)
   - **Bono de Ataque**: Modificador de ataque base
-  - **Daño Base**: Daño promedio sin bonificadores
-  - **Dureza** (opcional): Para criaturas grandes (HP > 20)
+  - **Daño Base**: Daño promedio por ataque
+  - **Alcance (Reach)**: 5ft estándar, 10ft para criaturas grandes
+  - **Formación**:
+    - `frontWidth`: Ancho del frente en criaturas
+    - `flankExposure`: Exposición de flancos en criaturas
+    - `rowsAttacking`: Filas que pueden atacar (2 base, 3 si reach ≥ 10ft)
+  - **Moral Warhammer**: Valor entre 2-12 para chequeo 2d6
+  - **Porta Estandarte**: Boolean (true si compañía ≥ 10 criaturas)
   
-- Unidad puede tener un **Personaje Especial Líder** (Capitán, Sargento)
+- Daño recibido reduce HP total, recalculando `creaturesCount` dinámicamente
+- Formación se recalcula automáticamente al perder criaturas
 
-### FR-2: Mecánica de Combate a Escala
-**Descripción**: Resolver ataques entre unidades sin tiradas masivas
+### FR-2: Mecánica de Combate a Escala Warhammer
+**Descripción**: Resolver ataques con formación y multi-ataques
 
 #### FR-2.1: Ataque General
-- Una unidad lanza **1d20** (no múltiples dados)
-- Suma: Bono de Ataque + Bono de Masa
-  - Bono de Masa = +1 por cada 5 PF actuales
-  - Ejemplo: Unidad con 12 PF suma +2
-- Compara contra CA del objetivo
+- Unidad lanza **múltiples d20** según formación:
+  - Ataques disponibles = `frontWidth × rowsAttacking`
+  - Ejemplo: Frente 4, Filas 2 = 8 ataques
+- Cada ataque: `d20 + Bono de Ataque` vs CA del objetivo
+- Impactos causan daño en HP (no más PF)
 
 #### FR-2.2: Daño de Unidad a Unidad
-- Impacto = **1 PF** de daño
-- Si supera CA por 5+: **+1 PF** adicional (Regla de Hender)
-- Reducir PF representa muertes en la unidad
+- Cada impacto = `Daño Base` del atacante
+- Si supera CA por 5+: Daño × 1.5 (Regla de Hender)
+- Daño total acumulado reduce HP de la unidad defensora
+- HP perdidos reducen `creaturesCount` = ceil(HP / HP_individual)
 
-#### FR-2.3: Daño a Personaje Individual
+#### FR-2.3: Formación y Filas Atacantes
+- Formación cuadrada aproximada: `frontWidth = ceil(sqrt(criaturesCount))`
+- Depth (profundidad) = `ceil(creaturesCount / frontWidth)`
+- `flankExposure` = min(depth, creaturesCount)
+- **Filas atacantes**:
+  - 2 filas si `reachFeet < 10`
+  - 3 filas si `reachFeet ≥ 10` (armas con alcance o criaturas grandes)
+
+#### FR-2.4: Daño a Personaje Individual
 - Unidad que impacta personaje le causa:
-  - Daño = (Daño Base Promedio) + (Bono de Masa)
-  - Daño va a HP del personaje, no a PF
-
-#### FR-2.4: Dureza para Criaturas Grandes
-- Criaturas con HP < 20: 1 impacto = 1 PF
-- Criaturas Grandes (HP 20-50): Dureza 3
-  - Necesita 3 impactos exitosos para causar 1 PF de daño
-- Criaturas Muy Grandes (HP > 50): Dureza 5+
+  - Daño total = suma de todos los impactos × Daño Base
+  - Daño va a HP del personaje
 
 ### FR-3: Combate Personaje Individual vs Unidad
 **Descripción**: Interacción asimétrica cuando un héroe enfrenta una turba
 
 #### FR-3.1: Ataque del Personaje a Unidad
 - Personaje ataca con **Ventaja** contra unidades (fácil acertar masa)
-- Cada impacto exitoso = **1 PF** de daño
-- Si supera CA por 5+: Causa +1 PF (Regla de Hender)
+- Cada impacto exitoso = Daño del personaje a HP de la unidad
+- Si supera CA por 5+: Daño × 1.5 (Regla de Hender)
 - Ataque Extra del personaje: Múltiples ataques en un turno
 
 #### FR-3.2: Ataque de Unidad a Personaje
-- Unidad suma: Bono Ataque + Bono de Masa
-- Compara contra CA del personaje
+- Unidad usa formación completa (múltiples ataques)
+- Cada impacto causa Daño Base a HP del personaje
 - Si impacta: Daño a HP del personaje (D&D normal)
 
-#### FR-3.3: Zona de Amenaza
-- Unidad de combate tiene zona de amenaza de 5 pies
-- Si personaje entra/se mueve dentro: Unidad puede hacer Ataque de Oportunidad con **Desventaja**
-
-#### FR-3.4: Desafío al Líder (Duelo)
-- Personaje puede atacar específicamente al Líder de una unidad
-- Ataque con **Desventaja**
-- Si impacta: Daño va directo al Líder (no reduce PF masivo)
-- Si Líder muere: Unidad hace TS de Moral (Sabiduría CD 10) o queda Aturdida 1 turno
-
-#### FR-3.5: Arrollar (Overrun)
-- Unidades Grandes/Muy Grandes pueden intentar Overrun
-- Personaje hace TS Destreza o Fuerza
-- Si falla: Personaje es derribado (Prone)
-- Sufre daño automático del Overrun
-
-### FR-4: Reacciones Heroicas (2 por ronda contra diferentes unidades)
-**Descripción**: Habilidades especiales de personajes solos para no ser arrollados
+### FR-4: Sistema de Moral Warhammer
 
 #### FR-4.1: Repliegue Táctico
 - Disponible para: Pícaros, Monjes, Guardabosques
@@ -117,6 +117,38 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con dos
 - Gasto: 1 espacio de hechizo nivel 1
 - Efecto: Unidad hace TS Fuerza contra CD de salvación
 - Si falla: Empujada 10 pies atrás + pierde acción de ataque ese turno
+### FR-4: Sistema de Moral Warhammer
+**Descripción**: Chequeos de moral 2d6 vs valor de moral (2-12)
+
+#### FR-4.1: Valor de Moral
+- Cada tipo de criatura tiene valor de moral entre 2-12:
+  - **Goblin**: 5 (cobardes)
+  - **Ogre**: 6 (estúpidos pero fuertes)
+  - **Orc**: 7 (agresivos pero indisciplinados)
+  - **Human Guard**: 8 (disciplinados)
+  - **Skeleton**: 10 (sin miedo)
+- Mayor valor = más difícil fallar chequeo
+
+#### FR-4.2: Triggers de Chequeo de Moral
+Compañía debe realizar chequeo 2d6 vs moral cuando:
+- **Porta Estandarte cae**: `hasStandardBearer` pasa de true → false
+- **50% de bajas**: HP actual ≤ 50% de HP máximo
+
+#### FR-4.3: Resolución del Chequeo
+- Tirar **2d6**
+- Si resultado ≤ valor de moral: **Pasa** (mantiene posición)
+- Si resultado > valor de moral: **Falla** (huye del combate)
+  - `hasFledBattle = true`
+  - `moraleStatus = FRIGHTENED`
+  - Unidad sale del combate (no puede atacar ni ser atacada)
+
+#### FR-4.4: Inmunidad al Miedo
+- **Skeleton** con moral ≥ 10: Automáticamente pasa chequeos (sin miedo)
+- Otras unidades no-muertas pueden tener inmunidad específica
+
+#### FR-4.5: Redirección tras Huida (Futura)
+- Ganador puede redirigir unidad victoriosa para ayudar a aliados
+- Requiere sistema de objectives/targeting dinámico
 
 ### FR-5: Sistema de Magia a Gran Escala
 **Descripción**: Hechizos de personajes afectan a unidades, no a individuos
@@ -182,6 +214,25 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con dos
 #### FR-11.3: Finalización
 - Detectar fin automático cuando un equipo quede sin unidades vivas.
 - Mostrar ganador final y permitir iniciar nueva batalla.
+
+### FR-12: Visualización de estadísticas de unidad
+**Descripción**: Mostrar el bloque de estadísticas de cada tipo de unidad en CLI y Web.
+
+#### FR-12.1: Campos mínimos visibles
+- AC
+- PF actual/máximo de compañía
+- HP por criatura + fórmula de dados
+- Velocidad
+- STR/DEX/CON/INT/WIS/CHA
+- Ataque principal y secundario
+- Estado de moral
+
+#### FR-12.2: Cobertura de unidades base
+- Guard
+- Orc
+- Goblin
+- Skeleton
+- Ogre
 
 ### FR-7: Sistema de Battlefield (Campo de Batalla)
 **Descripción**: Mapa hexagonal o cuadriculado para posicionamiento

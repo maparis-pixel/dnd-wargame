@@ -1,27 +1,35 @@
 # D&D Wargames - Architect Specification
 
 **Rol:** System Architect  
-**Responsabilidad:** Diseño de arquitectura, componentes y estructura del sistema
+**Responsabilidad:** Diseño de arquitectura, componentes y estructura del sistema  
+**Versión:** 3.0 (Warhammer HP System)
 
 ---
 
 ## 1. Visión Arquitectónica
 
 ### 1.1 Principios de Diseño
-- [ ] Modularidad: Componentes independientes y reutilizables
-- [ ] Separación de responsabilidades (SoC)
-- [ ] Extensibilidad: Fácil agregar nuevas mecánicas
-- [ ] Mantenibilidad: Código limpio y bien documentado
+- [x] Modularidad: Componentes independientes y reutilizables
+- [x] Separación de responsabilidades (SoC)
+- [x] Extensibilidad: Fácil agregar nuevas mecánicas
+- [x] Mantenibilidad: Código limpio y bien documentado
 
 ### 1.2 Patrones a Utilizar
 - **MVC (Model-View-Controller)**: Separación entre lógica de juego y presentación
-- **Factory Pattern**: Crear entidades (Personajes, Enemigos, Items)
+- **Factory Pattern**: Crear entidades (Personajes, Unidades, Items) ✅ UnitFactory
 - **Strategy Pattern**: Diferentes estilos de combate
 - **Observer Pattern**: Sistema de eventos durante el combate
 
+### 1.3 Cambios Arquitectónicos v3.0
+- **HP por Compañía**: `CombatUnit` elimina PF, usa `hitPoints` (HP total) + `creaturesCount`
+- **Formación Warhammer**: `CombatUnit` añade `frontWidth`, `flankExposure`, `rowsAttacking`
+- **Moral 2d6**: `DiceRoller.roll2D6()` + chequeo en `CombatUnit.checkMorale(2d6)`
+- **Multi-ataques**: `CombatResolver` usa `getAttacksAvailable()` (frontWidth × rows)
+- **Web Stats**: `WebBattleServer.renderHomePage()` muestra stats debajo del nombre de unidad
+
 ---
 
-## 2. Componentes Principales (Wargame Scale)
+## 2. Componentes Principales (Wargame Scale v3.0)
 
 ### 2.1 Core Architecture
 
@@ -29,35 +37,45 @@
 com.dnd.wargames
 ├── units/                      (Definición de unidades)
 │   ├── Character.java          (Personaje individual)
-│   ├── CombatUnit.java         (Unidad de múltiples criaturas)
-│   ├── UnitTemplate.java       (Blueprint: Trasgo, Ogro, etc)
-│   ├── SpecialLeader.java      (Líder/Capitán en unidad)
-│   └── UnitState.java          (Estado de unidad: moral, PF, etc)
+│   ├── CombatUnit.java         (Unidad HP por compañía) ★ v3.0
+│   ├── CharacterClass.java     (Guerrero, Mago, etc)
+│   ├── CreatureType.java       (Trasgo, Ogre, Skeleton, etc)
+│   ├── MoraleEffect.java       (NONE, FRIGHTENED, CONFUSED, RAGING)
+│   └── UnitFactory.java        (Factory para crear unidades) ★ v3.0
 │
 ├── battle/                     (Sistema de combate)
 │   ├── WargameBattleEngine.java (Motor a escala batallón)
-│   ├── CombatResolver.java     (Resolve ataques y daño)
-│   ├── DiceRoller.java         (Sistema de dados D&D)
-│   ├── MassBonus.java          (Cálculo de bono masa)
+│   ├── CombatResolver.java     (Multi-ataques por formación) ★ v3.0
+│   ├── DiceRoller.java         (D&D + Warhammer 2d6) ★ v3.0
 │   └── InitiativeTracker.java  (Orden de turnos)
 │
 ├── web/                        (Interfaz Web ligera)
-│   └── WebBattleServer.java    (Servidor HTTP embebido)
+│   └── WebBattleServer.java    (HTTP con stats en selección) ★ v3.0
 │
-├── spells/                     (Sistema de magia a escala)
+├── cli/                        (Interfaz CLI)
+│   └── CommandLineInterface.java (Modo texto)
+│
+├── demo/                       (Demos de combate)
+│   └── CombatDemo.java         (Demo batalla CLI)
+│
+├── test/                       (Tests unitarios)
+│   ├── SimpleTest.java         (Test básico HP system) ★ v3.0
+│   └── BasicTest.java          (Test formación) ★ v3.0
+│
+├── spells/                     (Sistema de magia a escala - FUTURO)
 │   ├── SpellCaster.java        (Base para Mago/Clérigo/Bardo)
 │   ├── Spell.java              (Interfaz de hechizo)
 │   ├── AreaSpell.java          (Hechizos de daño/control)
 │   ├── SupportSpell.java       (Hechizos de sostenimiento)
 │   └── BattleInspiration.java  (Efectos de bardo)
 │
-├── reactions/                  (Reacciones heroicas)
+├── reactions/                  (Reacciones heroicas - FUTURO)
 │   ├── HeroicReaction.java     (Interfaz base)
 │   ├── TacticalRetreat.java    (Repliegue táctico)
 │   ├── WhirlwindSteel.java     (Torbellino de acero)
 │   └── RepulsionShield.java    (Escudo de repulsión)
 │
-├── battlefield/                (Gestión del mapa)
+├── battlefield/                (Gestión del mapa - FUTURO)
 │   ├── Battlefield.java        (Grid/mapa hexagonal)
 │   ├── Tile.java               (Hexágono individual)
 │   ├── Terrain.java            (Terreno: cobertura, altura)
@@ -127,6 +145,16 @@ WargameManager
     - El sistema devuelve estado actualizado y log del bloque
     - Se vuelve a solicitar nuevo bloque hasta fin de batalla
 - Estado en memoria por sesión de batalla (ID único), sin persistencia en disco.
+
+### 2.5 Bloque de estadísticas por unidad (2026-02)
+
+- Cada `CombatUnit` mantiene estadísticas detalladas de criatura base:
+    - AC, HP por criatura, fórmula de dados, velocidad
+    - STR/DEX/CON/INT/WIS/CHA
+    - ataque principal y secundario
+- Estas estadísticas se renderizan en:
+    - CLI (`showUnits` y confirmación de creación)
+    - Web (`formatUnits` en vista de batalla)
 
 ---
 

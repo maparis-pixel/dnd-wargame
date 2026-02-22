@@ -4,13 +4,27 @@ import java.util.Random;
 
 /**
  * Sistema de dados para D&D Wargames.
- * Maneja todas las tiradas de dados del juego.
+ * Maneja todas las tiradas de dados del juego (D&D y Warhammer).
  *
  * @author Lead Developer
- * @version 2.0
+ * @version 3.0
  */
 public class DiceRoller {
     private static final Random random = new Random();
+
+    /**
+     * Tira 2d6 (sistema Warhammer para chequeos de moral).
+     */
+    public static int roll2D6() {
+        return rollD6() + rollD6();
+    }
+
+    /**
+     * Tira 1d6.
+     */
+    public static int rollD6() {
+        return random.nextInt(6) + 1;
+    }
 
     /**
      * Tira un dado de 20 caras (d20).

@@ -57,6 +57,7 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 ## Versión
 - v1.0 - Creado: 2026-02-08
 - v2.1 - Actualizado: 2026-02-22 (Web UI + política obligatoria compile/tests)
+- v2.2 - Actualizado: 2026-02-22 (Estadísticas detalladas de unidades en CLI/Web)
 - Estado: Activo y en evolución
 
 ## Links de Referencia

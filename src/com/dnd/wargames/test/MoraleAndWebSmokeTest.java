@@ -1,46 +1,52 @@
 package com.dnd.wargames.test;
 
 import com.dnd.wargames.units.CombatUnit;
-import com.dnd.wargames.units.MoraleEffect;
 import com.dnd.wargames.units.UnitFactory;
+import com.dnd.wargames.battle.DiceRoller;
 import com.dnd.wargames.web.WebBattleServer;
 
 /**
- * Smoke test dedicado a validar moral y disponibilidad del modo web.
+ * Smoke test para validar moral Warhammer 2d6 y disponibilidad del modo web.
+ * @version 3.0
  */
 public class MoraleAndWebSmokeTest {
 
     public static void main(String[] args) {
-        System.out.println("🧪 MORALE + WEB SMOKE TEST");
-        System.out.println("===========================");
+        System.out.println("=== MORALE 2D6 + WEB SMOKE TEST v3.0 ===\n");
 
         boolean passed = true;
 
+        // Test 1: Moral Warhammer 2d6
         try {
+            System.out.println("Test 1: Moral Warhammer 2d6");
             CombatUnit guards = UnitFactory.createHumanGuards(10);
-
-            guards.takeDamage(2);
-            if (guards.getMoraleStatus() != MoraleEffect.RAGING || guards.getMoraleAttackModifier() != 2) {
-                throw new IllegalStateException("Estado RAGING inválido");
+            
+            // Validar valor de moral Warhammer
+            int morale = guards.getMorale();
+            if (morale < 2 || morale > 12) {
+                throw new IllegalStateException("Moral fuera de rango Warhammer (2-12): " + morale);
             }
-
-            guards.takeDamage(3);
-            if (guards.getMoraleStatus() != MoraleEffect.CONFUSED || guards.getMoraleAttackModifier() != -1) {
-                throw new IllegalStateException("Estado CONFUSED inválido");
+            
+            // Tirar 2d6 y validar rango
+            int roll = DiceRoller.roll2D6();
+            if (roll < 2 || roll > 12) {
+                throw new IllegalStateException("2d6 fuera de rango: " + roll);
             }
+            
+            // Chequeo de moral
+            boolean moraleCheck = guards.checkMorale(roll);
+            System.out.println("   Moral = " + morale + ", 2d6 = " + roll + ", resultado = " + (moraleCheck ? "Pasa" : "Huye"));
 
-            guards.takeDamage(3);
-            if (guards.getMoraleStatus() != MoraleEffect.FRIGHTENED || guards.getMoraleAttackModifier() != -2) {
-                throw new IllegalStateException("Estado FRIGHTENED inválido");
-            }
-
-            System.out.println("✅ Transiciones de moral correctas");
+            System.out.println("✅ Sistema de moral Warhammer 2d6 OK");
         } catch (Exception e) {
             passed = false;
-            System.out.println("❌ Error en validación de moral: " + e.getMessage());
+            System.out.println("❌ Error en moral Warhammer: " + e.getMessage());
+            e.printStackTrace();
         }
 
+        // Test 2: Web instantiation
         try {
+            System.out.println("\nTest 2: Instanciación WebBattleServer");
             WebBattleServer server = new WebBattleServer();
             if (server == null) {
                 throw new IllegalStateException("No se pudo instanciar WebBattleServer");
@@ -49,12 +55,13 @@ public class MoraleAndWebSmokeTest {
         } catch (Exception e) {
             passed = false;
             System.out.println("❌ Error en validación web: " + e.getMessage());
+            e.printStackTrace();
         }
 
         if (passed) {
-            System.out.println("🎉 SMOKE TEST OK");
+            System.out.println("\n=== SMOKE TEST OK ===");
         } else {
-            System.out.println("⚠️ SMOKE TEST CON FALLOS");
+            System.out.println("\n=== SMOKE TEST CON FALLOS ===");
             System.exit(1);
         }
     }

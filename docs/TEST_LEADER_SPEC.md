@@ -1,7 +1,8 @@
 # D&D Wargames - Test Leader Specification
 
 **Rol:** Test Lead / QA Lead  
-**Responsabilidad:** Estrategia de testing, casos de prueba y validación
+**Responsabilidad:** Estrategia de testing, casos de prueba y validación  
+**Versión:** 3.0 (Warhammer HP System)
 
 ---
 
@@ -19,17 +20,25 @@
 - **Integration Tests**: Todos los flujos críticos
 - **Smoke Tests**: Validaciones básicas pre-deployment
 
-### 1.3 Gate Obligatorio por Iteración
+### 1.3 Gate Obligatorio por Iteración v3.0
 
 En este repositorio, cada iteración debe ejecutar:
 
-1. Compilación completa del proyecto.
-2. Suite mínima obligatoria:
-  - `com.dnd.wargames.test.SimpleTest`
-  - `com.dnd.wargames.test.BasicTest`
-  - `com.dnd.wargames.test.MoraleAndWebSmokeTest`
+1. **Compilación completa** del proyecto: `Compile D&D Wargames` task.
+2. **Suite mínima obligatoria** (1 única ejecución completa):
+  - `com.dnd.wargames.test.SimpleTest` (HP system, formación básica)
+  - `com.dnd.wargames.test.BasicTest` (multi-ataques, moral Warhammer)
+  - `com.dnd.wargames.test.MoraleAndWebSmokeTest` (2d6 moral, web instantiation)
 
 Si cualquier punto falla, la iteración no se considera válida.
+
+Cobertura mínima adicional de dominio v3.0:
+- Validar que unidades base conserven estadísticas correctas:
+  - **HP/criatura**, **AC**, **Ataque**, **Daño**, **Moral Warhammer (2-12)**
+  - **Alcance** (5ft estándar, 10ft Ogre)
+  - **Formación**: `frontWidth`, `rowsAttacking` (2 o 3 según reach)
+- Validar `getAttacksAvailable()` = frontWidth × rowsAttacking
+- Validar `checkMorale(2d6)` con triggers: porta estandarte, 50% HP
 
 ---
 
@@ -38,11 +47,11 @@ Si cualquier punto falla, la iteración no se considera válida.
 ### 2.1 Framework & Tools
 - **Estado actual en repo**: Tests ejecutables por clase `main` (sin JUnit)
 - **Ejecución**: `java -cp src <test-class>`
-- **Cobertura mínima funcional**: smoke + validaciones de mecánicas core
+- **Cobertura mínima funcional**: smoke + validaciones de mecánicas core (HP + formación + moral 2d6)
 
 Nota: La adopción de JUnit puede planificarse como mejora futura, pero la validación actual obligatoria se realiza con tests `main`.
 
-### 2.2 Estructura de Tests (Wargame Scale)
+### 2.2 Estructura de Tests (Wargame Scale v3.0)
 ```
 src/test/java/com/dnd/wargames/
 ├── units/

@@ -19,6 +19,7 @@
 - 👥 Fábrica de unidades (Guardias, Orcos, Guerreros, Magos)
 - 🏰 Batallas por turnos con iniciativa
 - 💻 Interfaz de comandos completa
+- 📋 Bloque detallado de estadísticas de unidad (CLI y Web)
 - 🧪 Suite de tests automatizados
 
 ### 📁 **Archivos Clave**

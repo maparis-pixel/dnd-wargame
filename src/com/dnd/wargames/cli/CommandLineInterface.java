@@ -414,7 +414,7 @@ public class CommandLineInterface {
         }
 
         units.add(unit);
-        System.out.println("✓ Unidad creada: " + unit);
+        System.out.println("✓ Unidad creada: " + unit.toStatsString());
         System.out.println("Presiona Enter para continuar...");
         scanner.nextLine();
         showMainMenu();
@@ -438,7 +438,7 @@ public class CommandLineInterface {
 
             System.out.println("UNIDADES DE COMBATE:");
             for (int i = 0; i < units.size(); i++) {
-                System.out.println((i + 1) + ". " + units.get(i));
+                System.out.println((i + 1) + ". " + units.get(i).toStatsString());
             }
         }
 

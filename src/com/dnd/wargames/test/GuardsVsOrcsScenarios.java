@@ -89,8 +89,8 @@ public class GuardsVsOrcsScenarios {
         return new Result(
                 guardsCount,
                 orcsCount,
-                guardias.getStrengthPoints(),
-                orcos.getStrengthPoints(),
+                guardias.getCreaturesCount(),
+                orcos.getCreaturesCount(),
                 turns,
                 winner
         );

@@ -125,15 +125,15 @@ public class WebBattleServer {
             String key = type.name();
             String team = form.getOrDefault("team_" + key, "none");
             int companies = parseInt(form.get("companies_" + key), 0);
-            int pfPerCompany = parseInt(form.get("pf_" + key), 0);
+            int creaturesPerCompany = parseInt(form.get("creatures_" + key), 0);
 
-            if (companies <= 0 || pfPerCompany <= 0 || "none".equals(team)) {
+            if (companies <= 0 || creaturesPerCompany <= 0 || "none".equals(team)) {
                 continue;
             }
 
             for (int i = 1; i <= companies; i++) {
-                CombatUnit unit = createUnit(type, pfPerCompany);
-                unit.setName(type.getDisplayName() + " Cía " + i + " (" + pfPerCompany + " PF)");
+                CombatUnit unit = createUnit(type, creaturesPerCompany);
+                unit.setName(type.getDisplayName() + " Cía " + i + " (" + creaturesPerCompany + " criaturas)");
 
                 if ("ally".equals(team)) {
                     session.engine.addToTeam1(unit);
@@ -174,18 +174,18 @@ public class WebBattleServer {
         return list;
     }
 
-    private CombatUnit createUnit(CreatureType type, int pfPerCompany) {
+    private CombatUnit createUnit(CreatureType type, int creaturesCount) {
         switch (type) {
             case HUMAN_GUARD:
-                return UnitFactory.createHumanGuards(pfPerCompany);
+                return UnitFactory.createHumanGuards(creaturesCount);
             case ORC:
-                return UnitFactory.createOrcs(pfPerCompany);
+                return UnitFactory.createOrcs(creaturesCount);
             case GOBLIN:
-                return UnitFactory.createGoblins(pfPerCompany);
+                return UnitFactory.createGoblins(creaturesCount);
             case SKELETON:
-                return UnitFactory.createSkeletons(pfPerCompany);
+                return UnitFactory.createSkeletons(creaturesCount);
             case OGRE:
-                return UnitFactory.createOgres(pfPerCompany);
+                return UnitFactory.createOgres(creaturesCount);
             default:
                 throw new IllegalArgumentException("Tipo no soportado en web: " + type);
         }
@@ -233,30 +233,46 @@ public class WebBattleServer {
             .append("th,td{border:1px solid #ccc;padding:8px;text-align:left;}th{background:#f2f2f2;}")
             .append("input,select{width:100%;padding:6px;}.box{background:#f8f8f8;border:1px solid #ddd;padding:12px;margin-bottom:16px;}")
             .append(".btn{padding:10px 16px;border:none;background:#222;color:#fff;cursor:pointer;}")
+            .append(".stats{font-size:0.85em;color:#555;margin-top:4px;}")
             .append("</style></head><body>")
-            .append("<h1>⚔️ D&D Wargames - Configuración Web</h1>")
+            .append("<h1>⚔️ D&D Wargames - Configuración Web (HP System)</h1>")
             .append("<div class='box'>").append(escapeHtml(message)).append("</div>")
             .append("<form method='post' action='/start'>")
-            .append("<table><thead><tr><th>Tipo de unidad</th><th>Equipo</th><th>Nº compañías</th><th>PF por compañía</th></tr></thead><tbody>");
+            .append("<table><thead><tr><th>Tipo de unidad</th><th>Equipo</th><th>Nº compañías</th><th>Criaturas por compañía</th></tr></thead><tbody>");
 
         for (CreatureType type : getSupportedWebTypes()) {
             String key = type.name();
+            
+            // Crear unidad temporal para mostrar stats
+            CombatUnit sample = createUnit(type, 1);
+            String stats = String.format("AC %d | HP/criatura %d (%s) | Vel %d ft | Alcance %d ft | Atk +%d daño %d | Moral %d",
+                sample.getArmorClass(),
+                sample.getHitPointsPerCreature(),
+                sample.getHitDiceFormula(),
+                sample.getSpeedFeet(),
+                sample.getReachFeet(),
+                sample.getBaseAttackBonus(),
+                sample.getBaseDamage(),
+                sample.getMorale()
+            );
+            
             html.append("<tr>")
-                .append("<td>").append(escapeHtml(type.getDisplayName())).append("</td>")
+                .append("<td><strong>").append(escapeHtml(type.getDisplayName())).append("</strong>")
+                .append("<div class='stats'>").append(escapeHtml(stats)).append("</div></td>")
                 .append("<td><select name='team_").append(key).append("'>")
                 .append("<option value='none'>No incluir</option>")
                 .append("<option value='ally'>Aliados</option>")
                 .append("<option value='enemy'>Enemigos</option>")
                 .append("</select></td>")
                 .append("<td><input type='number' min='0' value='0' name='companies_").append(key).append("'></td>")
-                .append("<td><input type='number' min='1' value='5' name='pf_").append(key).append("'></td>")
+                .append("<td><input type='number' min='1' value='5' name='creatures_").append(key).append("'></td>")
                 .append("</tr>");
         }
 
         html.append("</tbody></table><br>")
             .append("<button class='btn' type='submit'>Crear batalla</button>")
             .append("</form>")
-            .append("<p><strong>Moral en combate:</strong> Enfurecido (+2 ataque), Confundido (-1), Asustado (-2). El estado cambia según PF restantes.</p>")
+            .append("<p><strong>Sistema Warhammer:</strong> HP por compañía, formación con ataques por filas (2 base, 3 si alcance 10ft), moral 2d6.</p>")
             .append("</body></html>");
 
         return html.toString();
@@ -312,13 +328,7 @@ public class WebBattleServer {
         sb.append("<ul>");
         for (CombatUnit unit : units) {
             sb.append("<li>")
-              .append(escapeHtml(unit.getName()))
-              .append(" - PF ")
-              .append(unit.getStrengthPoints())
-              .append("/")
-              .append(unit.getMaxStrengthPoints())
-              .append(" - Moral: ")
-              .append(escapeHtml(unit.getMoraleStatus().toString()))
+              .append(escapeHtml(unit.toStatsString()))
               .append("</li>");
         }
         sb.append("</ul>");

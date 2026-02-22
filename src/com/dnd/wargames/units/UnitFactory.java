@@ -5,7 +5,7 @@ package com.dnd.wargames.units;
  * Proporciona plantillas estándar para criaturas comunes.
  *
  * @author Lead Developer
- * @version 2.0
+ * @version 3.0
  */
 public class UnitFactory {
 
@@ -15,14 +15,7 @@ public class UnitFactory {
     public static CombatUnit createHumanGuards(int count) {
         String name = count + " Guardias Humanos";
         CombatUnit unit = new CombatUnit(name, CreatureType.HUMAN_GUARD, count);
-
-        // Ajustes específicos para guardias humanos
-        unit.setArmorClass(16); // Armadura de placas
-        unit.setBaseAttackBonus(3);
-        unit.setBaseDamage(8); // Espada larga
-        unit.setDexterity(12);
-        unit.setMorale(15); // Alta moral disciplinada
-
+        // Los valores vienen de setDefaultStatsForCreatureType (moral Warhammer = 8)
         return unit;
     }
 
@@ -32,14 +25,7 @@ public class UnitFactory {
     public static CombatUnit createOrcs(int count) {
         String name = count + " Orcos";
         CombatUnit unit = new CombatUnit(name, CreatureType.ORC, count);
-
-        // Ajustes específicos para orcos
-        unit.setArmorClass(13); // Armadura de cuero tachonado
-        unit.setBaseAttackBonus(3);
-        unit.setBaseDamage(7); // Hacha grande
-        unit.setDexterity(12);
-        unit.setMorale(14); // Alta moral agresiva
-
+        // Los valores vienen de setDefaultStatsForCreatureType (moral Warhammer = 7)
         return unit;
     }
 
@@ -49,7 +35,8 @@ public class UnitFactory {
     public static CombatUnit createGoblins(int count) {
         String name = count + " Trasgos";
         CombatUnit unit = new CombatUnit(name, CreatureType.GOBLIN, count);
-        return unit; // Usa valores por defecto
+        // Los valores vienen de setDefaultStatsForCreatureType (moral Warhammer = 5)
+        return unit;
     }
 
     /**
@@ -58,7 +45,8 @@ public class UnitFactory {
     public static CombatUnit createSkeletons(int count) {
         String name = count + " Esqueletos";
         CombatUnit unit = new CombatUnit(name, CreatureType.SKELETON, count);
-        return unit; // Usa valores por defecto
+        // Los valores vienen de setDefaultStatsForCreatureType (moral Warhammer = 10, sin miedo)
+        return unit;
     }
 
     /**
@@ -67,7 +55,8 @@ public class UnitFactory {
     public static CombatUnit createOgres(int count) {
         String name = count + " Ogros";
         CombatUnit unit = new CombatUnit(name, CreatureType.OGRE, count);
-        return unit; // Usa valores por defecto (incluye dureza 3)
+        // Los valores vienen de setDefaultStatsForCreatureType (moral Warhammer = 6)
+        return unit;
     }
 
     /**
