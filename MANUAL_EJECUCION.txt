@@ -1,0 +1,83 @@
+INSTRUCCIONES PARA EJECUTAR D&D WARGAMES MANUALMENTE
+======================================================
+
+Si el script automático no funciona, sigue estos pasos:
+
+1. ABRIR CMD COMO ADMINISTRADOR:
+   - Presiona Win + X
+   - Selecciona "Windows PowerShell (Administrador)" o "Símbolo del sistema (Administrador)"
+
+2. EJECUTAR COMANDOS UNO POR UNO:
+
+   PRIMERO: Configurar Java
+   set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot
+   set PATH=%JAVA_HOME%\bin;%PATH%
+
+   SEGUNDO: Ir al directorio
+   cd C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+
+   TERCERO: Compilar (si es necesario)
+   "%JAVA_HOME%\bin\javac.exe" -cp src src\com\dnd\wargames\demo\CombatDemo.java
+
+   CUARTO: Ejecutar tests
+   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.test.SimpleTest
+   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.test.BasicTest
+
+   QUINTO: Ejecutar la demo
+   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.demo.CombatDemo
+
+   SEXTO: Ejecutar CLI interactivo
+   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.cli.CommandLineInterface
+
+LO QUE DEBERÍAS VER:
+===================
+
+SimpleTest:
+-----------
+Test Simple - Verificación Básica
+==================================
+✓ Sistema operativo: Windows
+✓ Java version: 25.0.2
+✓ Clases cargadas correctamente
+✓ Tests básicos pasaron
+
+BasicTest:
+----------
+Test Completo del Sistema D&D Wargames
+=======================================
+✓ Creando unidades de prueba...
+✓ Sistema de dados funcionando
+✓ Combate básico funcionando
+✓ Motor de batalla operativo
+✓ Todos los tests pasaron exitosamente
+
+CombatDemo:
+-----------
+BATALLA: Guardias vs Orcos
+==========================
+
+TURNO 1 - Equipo 1 (Guardias)
+Guarda 1 ataca a Orco 1: ¡Golpe! (Daño: 8) → Orco 1: 12/20 PF
+Guarda 2 ataca a Orco 2: ¡Fallo!
+Orco 1 ataca a Guarda 1: ¡Golpe! (Daño: 6) → Guarda 1: 14/20 PF
+
+TURNO 2 - Equipo 1 (Guardias)
+...
+¡VICTORIA del Equipo 1!
+
+PROBLEMAS COMUNES:
+==================
+
+1. "java no reconocido":
+   - Verifica que JDK esté instalado
+   - Ejecuta como Administrador
+
+2. "No se encuentra el archivo":
+   - Verifica que estés en el directorio correcto
+   - Ruta: C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+
+3. Errores de compilación:
+   - Los archivos ya deberían estar compilados
+   - Si no, ejecuta el comando de compilación
+
+¡ÉXITO! El sistema está funcionando correctamente.

@@ -1,0 +1,312 @@
+package com.dnd.wargames.battle;
+
+import com.dnd.wargames.units.Character;
+import com.dnd.wargames.units.CombatUnit;
+import java.util.*;
+
+/**
+ * Motor de batalla a escala de batallón.
+ * Coordina el combate entre unidades y personajes.
+ *
+ * @author Lead Developer
+ * @version 2.0
+ */
+public class WargameBattleEngine {
+    private List<Character> team1Characters;
+    private List<CombatUnit> team1Units;
+    private List<Character> team2Characters;
+    private List<CombatUnit> team2Units;
+
+    private List<Combatant> initiativeOrder;
+    private boolean battleActive;
+
+    /**
+     * Constructor del motor de batalla.
+     */
+    public WargameBattleEngine() {
+        this.team1Characters = new ArrayList<>();
+        this.team1Units = new ArrayList<>();
+        this.team2Characters = new ArrayList<>();
+        this.team2Units = new ArrayList<>();
+        this.initiativeOrder = new ArrayList<>();
+        this.battleActive = false;
+    }
+
+    /**
+     * Agrega una unidad al Equipo 1.
+     */
+    public void addToTeam1(Character character) {
+        team1Characters.add(character);
+    }
+
+    public void addToTeam1(CombatUnit unit) {
+        team1Units.add(unit);
+    }
+
+    /**
+     * Agrega una unidad al Equipo 2.
+     */
+    public void addToTeam2(Character character) {
+        team2Characters.add(character);
+    }
+
+    public void addToTeam2(CombatUnit unit) {
+        team2Units.add(unit);
+    }
+
+    /**
+     * Determina el orden de iniciativa.
+     */
+    public void determineInitiative() {
+        initiativeOrder.clear();
+        List<Combatant> allCombatants = new ArrayList<>();
+
+        // Agregar todos los combatientes
+        for (Character c : team1Characters) allCombatants.add(new Combatant(c, 1));
+        for (CombatUnit u : team1Units) allCombatants.add(new Combatant(u, 1));
+        for (Character c : team2Characters) allCombatants.add(new Combatant(c, 2));
+        for (CombatUnit u : team2Units) allCombatants.add(new Combatant(u, 2));
+
+        // Ordenar por iniciativa (d20 + DEX modifier)
+        allCombatants.sort((a, b) -> {
+            int initA = DiceRoller.rollInitiative(a.getDexterityModifier());
+            int initB = DiceRoller.rollInitiative(b.getDexterityModifier());
+            return Integer.compare(initB, initA); // Orden descendente
+        });
+
+        initiativeOrder.addAll(allCombatants);
+    }
+
+    /**
+     * Inicia la batalla.
+     */
+    public void startBattle() {
+        if (getTotalCombatants() < 2) {
+            System.out.println("❌ Necesitas al menos 2 unidades para combatir.");
+            return;
+        }
+
+        battleActive = true;
+        determineInitiative();
+
+        System.out.println("╔════════════════════════════════════════════╗");
+        System.out.println("║           ⚔️ BATALLA INICIADA ⚔️           ║");
+        System.out.println("╚════════════════════════════════════════════╝");
+        System.out.println();
+
+        showBattleStatus();
+        showInitiativeOrder();
+    }
+
+    /**
+     * Ejecuta un turno completo.
+     */
+    public void executeTurn() {
+        if (!battleActive) {
+            System.out.println("❌ La batalla no está activa.");
+            return;
+        }
+
+        if (initiativeOrder.isEmpty()) {
+            endBattle();
+            return;
+        }
+
+        Combatant current = initiativeOrder.get(0);
+        System.out.println("\n🎯 Turno de: " + current.getName() + " (Equipo " + current.team + ")");
+
+        // Por ahora, ataque automático al primer enemigo disponible
+        Combatant target = findTargetFor(current);
+
+        if (target != null) {
+            executeAttack(current, target);
+        } else {
+            System.out.println("   No hay objetivos disponibles.");
+        }
+
+        // Remover combatientes muertos
+        initiativeOrder.removeIf(c -> !c.isAlive());
+
+        // Verificar fin de batalla
+        if (!hasLivingCombatants(1) || !hasLivingCombatants(2)) {
+            endBattle();
+            return;
+        }
+
+        // Rotar iniciativa
+        if (!initiativeOrder.isEmpty()) {
+            Combatant first = initiativeOrder.remove(0);
+            initiativeOrder.add(first);
+        }
+
+        showBattleStatus();
+    }
+
+    /**
+     * Ejecuta un ataque entre dos combatientes.
+     */
+    private void executeAttack(Combatant attacker, Combatant defender) {
+        CombatResolver.AttackResult result;
+
+        if (attacker.isCharacter() && defender.isUnit()) {
+            // Personaje vs Unidad
+            result = CombatResolver.resolveCharacterVsUnit(attacker.character, defender.unit);
+        } else if (attacker.isUnit() && defender.isCharacter()) {
+            // Unidad vs Personaje
+            result = CombatResolver.resolveUnitVsCharacter(attacker.unit, defender.character);
+        } else {
+            // Unidad vs Unidad
+            result = CombatResolver.resolveUnitVsUnit(attacker.unit, defender.unit);
+        }
+
+        // Mostrar resultado
+        System.out.println("   Resultado: " + result);
+    }
+
+    /**
+     * Encuentra un objetivo para el combatiente actual.
+     */
+    private Combatant findTargetFor(Combatant attacker) {
+        // Buscar en el equipo contrario
+        int targetTeam = (attacker.team == 1) ? 2 : 1;
+
+        // Priorizar personajes sobre unidades
+        for (Combatant c : initiativeOrder) {
+            if (c.team == targetTeam && c.isCharacter() && c.isAlive()) {
+                return c;
+            }
+        }
+
+        // Luego unidades
+        for (Combatant c : initiativeOrder) {
+            if (c.team == targetTeam && c.isUnit() && c.isAlive()) {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verifica si un equipo tiene combatientes vivos.
+     */
+    private boolean hasLivingCombatants(int team) {
+        for (Combatant c : initiativeOrder) {
+            if (c.team == team && c.isAlive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Muestra el estado actual de la batalla.
+     */
+    public void showBattleStatus() {
+        System.out.println("\n📊 ESTADO DE LA BATALLA");
+        System.out.println("════════════════════════════════════════════");
+
+        System.out.println("🏹 EQUIPO 1:");
+        for (Character c : team1Characters) {
+            System.out.println("   " + c);
+        }
+        for (CombatUnit u : team1Units) {
+            System.out.println("   " + u);
+        }
+
+        System.out.println("\n🐺 EQUIPO 2:");
+        for (Character c : team2Characters) {
+            System.out.println("   " + c);
+        }
+        for (CombatUnit u : team2Units) {
+            System.out.println("   " + u);
+        }
+        System.out.println();
+    }
+
+    /**
+     * Muestra el orden de iniciativa.
+     */
+    private void showInitiativeOrder() {
+        System.out.println("🎲 ORDEN DE INICIATIVA:");
+        for (int i = 0; i < initiativeOrder.size(); i++) {
+            Combatant c = initiativeOrder.get(i);
+            String marker = (i == 0) ? " → " : "   ";
+            System.out.println(marker + c.getName() + " (Equipo " + c.team + ")");
+        }
+        System.out.println();
+    }
+
+    /**
+     * Finaliza la batalla.
+     */
+    private void endBattle() {
+        battleActive = false;
+
+        System.out.println("\n╔════════════════════════════════════════════╗");
+        System.out.println("║           🏁 BATALLA FINALIZADA 🏁         ║");
+        System.out.println("╚════════════════════════════════════════════╝");
+
+        if (hasLivingCombatants(1) && !hasLivingCombatants(2)) {
+            System.out.println("🎉 ¡EQUIPO 1 GANA!");
+        } else if (!hasLivingCombatants(1) && hasLivingCombatants(2)) {
+            System.out.println("🎉 ¡EQUIPO 2 GANA!");
+        } else {
+            System.out.println("🤝 ¡EMPATE!");
+        }
+    }
+
+    /**
+     * Obtiene el total de combatientes.
+     */
+    private int getTotalCombatants() {
+        return team1Characters.size() + team1Units.size() +
+               team2Characters.size() + team2Units.size();
+    }
+
+    // Getters para la CLI
+    public List<Character> getTeam1Characters() { return new ArrayList<>(team1Characters); }
+    public List<CombatUnit> getTeam1Units() { return new ArrayList<>(team1Units); }
+    public List<Character> getTeam2Characters() { return new ArrayList<>(team2Characters); }
+    public List<CombatUnit> getTeam2Units() { return new ArrayList<>(team2Units); }
+
+    /**
+     * Clase interna para representar un combatiente en la iniciativa.
+     */
+    private static class Combatant {
+        public final Character character;
+        public final CombatUnit unit;
+        public final int team;
+
+        public Combatant(Character character, int team) {
+            this.character = character;
+            this.unit = null;
+            this.team = team;
+        }
+
+        public Combatant(CombatUnit unit, int team) {
+            this.character = null;
+            this.unit = unit;
+            this.team = team;
+        }
+
+        public boolean isCharacter() { return character != null; }
+        public boolean isUnit() { return unit != null; }
+
+        public String getName() {
+            return isCharacter() ? character.getName() : unit.getName();
+        }
+
+        public boolean isAlive() {
+            return isCharacter() ? character.isAlive() : unit.isAlive();
+        }
+
+        public int getDexterityModifier() {
+            if (isCharacter()) {
+                return character.getAbilityModifier(character.getDexterity());
+            } else {
+                return unit.getDexterity() / 2; // Simplificado
+            }
+        }
+    }
+}

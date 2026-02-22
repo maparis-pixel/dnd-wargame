@@ -1,0 +1,52 @@
+INSTRUCCIONES PARA EJECUTAR D&D WARGAMES
+==========================================
+
+¡El sistema está listo! Aquí tienes las instrucciones paso a paso:
+
+1. ABRIR TERMINAL:
+   - Presiona Win + R
+   - Escribe "cmd" y presiona Enter
+   - O busca "Símbolo del sistema" en el menú Inicio
+
+2. NAVEGAR AL DIRECTORIO:
+   cd C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+
+3. EJECUTAR EL SISTEMA:
+   run_system.bat
+
+   O ejecuta manualmente:
+   java -cp src com.dnd.wargames.test.SimpleTest
+   java -cp src com.dnd.wargames.test.BasicTest
+   java -cp src com.dnd.wargames.demo.CombatDemo
+   java -cp src com.dnd.wargames.cli.CommandLineInterface
+
+LO QUE VERÁS:
+=============
+
+1. SimpleTest: Verifica que las clases funcionan
+2. BasicTest: Tests completos de combate
+3. CombatDemo: Batalla automática entre guardias y orcos
+4. CLI: Interfaz interactiva para crear personajes y batallas
+
+EJEMPLO DE SALIDA ESPERADA:
+===========================
+
+BATALLA: Guardias vs Orcos
+==========================
+
+TURNO 1 - Equipo 1 (Guardias)
+Guarda 1 ataca a Orco 1: ¡Golpe! (Daño: 8) → Orco 1: 12/20 PF
+Guarda 2 ataca a Orco 2: ¡Fallo!
+...
+
+¡VICTORIA del Equipo 1!
+
+¿PROBLEMAS?
+===========
+
+Si ves errores, verifica:
+- Que tienes JDK instalado
+- Que estás en el directorio correcto
+- Que el proyecto está compilado (archivos .class en src/)
+
+¡DISFRUTA TU SISTEMA D&D WARGAMES!
