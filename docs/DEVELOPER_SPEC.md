@@ -661,6 +661,24 @@ Cada clase debe:
 
 ---
 
+## 8. Plan Técnico v3.2 (Implementación)
+
+### Decisiones Cerradas
+- Modelo final: combate detallado (sin BR abstracto).
+- Escala de referencia: 20 ft por casilla.
+- Moral por 50% de bajas: unidad `Rota` con retirada obligatoria.
+- Persecución: decisión manual del jugador en CLI.
+
+### Tareas de Código
+1. Consolidar estado de unidad y transiciones (`Normal -> Rota/Huyendo -> Reagrupada`).
+2. Aplicar gating de acciones para unidades rotas/huyendo (sin ataques regulares).
+3. Mantener pregunta de persecución y rama de retarget automático si no persigue.
+4. Limitar reagrupamiento a un intento por unidad con personaje aliado presente.
+5. Reflejar estado y transición en salidas de combate (`CombatResolver` y `WargameBattleEngine`).
+6. Documentar APIs nuevas o cambiadas para no romper CLI/Web.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08

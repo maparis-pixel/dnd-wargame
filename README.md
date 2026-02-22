@@ -26,6 +26,13 @@
   - frente de ataque limitado por frente enemigo +2 (con extensión si completa 2 filas)
   - bono por filas ocupadas: +2 por fila adicional
 
+### 🗺️ **Plan inmediato v3.2 (decisiones cerradas)**
+- Modo final: detallado (sin BR abstracto).
+- Escala táctica objetivo: 20 ft por casilla.
+- Moral al 50%: estado Rota + retirada obligatoria.
+- Persecución de unidades en huida: decisión manual en CLI.
+- Reagrupamiento: único intento con personaje aliado en trayectoria.
+
 ### 📁 **Archivos Clave**
 - `src/com/dnd/wargames/` - Código fuente completo
 - `run_system.bat` - Ejecución automática completa

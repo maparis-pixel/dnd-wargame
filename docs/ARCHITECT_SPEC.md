@@ -529,6 +529,22 @@ class BattleField {
 
 ---
 
+## 10. Plan Arquitectónico v3.2 (UA 2015-aligned)
+
+### Decisiones de Diseño Cerradas
+- Motor final en modo **detallado** (sin capa BR por defecto).
+- Escala táctica base de **20 ft** por celda.
+- Fallo de moral por 50% de bajas -> estado **Rota** con retirada obligatoria.
+- Persecución tras huida con decisión de jugador en CLI.
+
+### Implementación Arquitectónica
+1. Introducir una máquina de estados de unidad (`Normal/Rota/Huyendo/Reagrupada`).
+2. Separar explícitamente resolución de daño y resolución de moral/retiro.
+3. Mantener estrategia de decisión inyectable (`BattleDecisionProvider`) para persecución.
+4. Añadir punto de extensión para objetivos de batalla (VP) en fase posterior.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08

@@ -74,6 +74,21 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 - README general: [../README.md](../README.md)
 - Código fuente: `src/com/dnd/wargames/`
 
+## Plan v3.2 (Decisiones Cerradas)
+
+### Decisiones Finales
+- Modelo final: **detallado** (sin BR abstracto de UA 2017).
+- Escala base: **20 ft por casilla** y **1 minuto por ronda**.
+- Moral por 50% de bajas: estado **Rota** con **retirada obligatoria**.
+- Persecución tras huida: **decisión manual** del jugador en CLI.
+
+### Plan de Implementación
+1. Formalizar estados de unidad: `Normal`, `Rota`, `Huyendo`, `Reagrupada`.
+2. Restringir acciones de unidad rota a retirada/reagrupamiento.
+3. Consolidar flujo de persecución o retarget manual tras huida.
+4. Limitar reagrupamiento a un intento, asistido por personaje aliado.
+5. Añadir pruebas de aceptación de moral, retirada y persecución.
+
 ## Changelog Corto
 - 2026-02-22: Sincronización de reglas de combate (filas por alcance, frente enemigo +2, bono por filas, turnos por 2 rondas).
 - 2026-02-22: Política de iteración y suite mínima de validación consolidada.

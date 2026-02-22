@@ -33,7 +33,7 @@ public class CombatResolver {
         int totalDamage = 0;
         int hits = 0;
 
-        System.out.println("🎲 " + attacker.getName() + " ataca a " + defender.getName());
+        System.out.println("🎲 " + attacker.getBattleDisplayName() + " ataca a " + defender.getBattleDisplayName());
         System.out.println("   Ataques disponibles: " + attacksAvailable + 
                           " (Frente " + attackerFormation.effectiveFrontWidth + 
                           " × Filas " + attackerFormation.occupiedAttackingRows +
@@ -60,14 +60,41 @@ public class CombatResolver {
             }
         }
 
+        boolean moraleChecked = false;
+        boolean moralePassed = true;
+        int moraleRoll = 0;
+
         if (hits > 0) {
             System.out.println("   ✅ " + hits + " impactos! " + totalDamage + " HP de daño total.");
+            boolean hadStandardBeforeDamage = defender.hasStandardBearer();
             defender.takeDamage(totalDamage);
+
+            MoraleResolution moraleResolution = resolveMoraleIfNeeded(defender, hadStandardBeforeDamage);
+            moraleChecked = moraleResolution.checked;
+            moralePassed = moraleResolution.passed;
+            moraleRoll = moraleResolution.roll;
+
+            if (moraleChecked) {
+                System.out.println("   🧠 Chequeo de moral (2d6): " + moraleRoll +
+                        " vs " + defender.getMorale() + " -> " + (moralePassed ? "PASA" : "FALLA"));
+                if (!moralePassed) {
+                    System.out.println("   🏳️ " + defender.getBattleDisplayName() + " huye del combate.");
+                }
+            }
         } else {
             System.out.println("   ❌ Todos los ataques fallaron!");
         }
 
-        return new AttackResult(hits > 0, totalDamage, hits, attacksAvailable);
+        return new AttackResult(
+                hits > 0,
+                totalDamage,
+                hits,
+                attacksAvailable,
+                moraleChecked,
+                moralePassed,
+                moraleRoll,
+                defender.hasFledBattle()
+        );
     }
 
     /**
@@ -86,7 +113,7 @@ public class CombatResolver {
         // Personaje tiene ventaja contra unidades (tira 2d6, toma el mayor)
         int attackRoll = DiceRoller.rollD20WithAdvantage(attacker.getAttackBonus());
 
-        System.out.println("⚔️  " + attacker.getName() + " ataca a " + defender.getName() + " (con ventaja)");
+        System.out.println("⚔️  " + attacker.getName() + " ataca a " + defender.getBattleDisplayName() + " (con ventaja)");
         System.out.println("   Tirada: " + (attackRoll - attacker.getAttackBonus()) +
                           " + " + attacker.getAttackBonus() + " (bonus) = " + attackRoll);
         System.out.println("   CA objetivo: " + defender.getArmorClass());
@@ -102,9 +129,28 @@ public class CombatResolver {
             }
 
             System.out.println("   ✅ Impacto! " + damage + " HP de daño.");
+            boolean hadStandardBeforeDamage = defender.hasStandardBearer();
             defender.takeDamage(damage);
 
-            return new AttackResult(true, damage, 1, 1);
+            MoraleResolution moraleResolution = resolveMoraleIfNeeded(defender, hadStandardBeforeDamage);
+            if (moraleResolution.checked) {
+                System.out.println("   🧠 Chequeo de moral (2d6): " + moraleResolution.roll +
+                        " vs " + defender.getMorale() + " -> " + (moraleResolution.passed ? "PASA" : "FALLA"));
+                if (!moraleResolution.passed) {
+                    System.out.println("   🏳️ " + defender.getBattleDisplayName() + " huye del combate.");
+                }
+            }
+
+            return new AttackResult(
+                    true,
+                    damage,
+                    1,
+                    1,
+                    moraleResolution.checked,
+                    moraleResolution.passed,
+                    moraleResolution.roll,
+                    defender.hasFledBattle()
+            );
         } else {
             System.out.println("   ❌ Fallo!");
             return new AttackResult(false, 0, 0, 1);
@@ -129,7 +175,7 @@ public class CombatResolver {
         int totalDamage = 0;
         int hits = 0;
 
-        System.out.println("👥 " + attacker.getName() + " ataca a " + defender.getName());
+        System.out.println("👥 " + attacker.getBattleDisplayName() + " ataca a " + defender.getName());
         System.out.println("   Ataques disponibles: " + attacksAvailable +
                           " (Frente " + attackerFormation.effectiveFrontWidth +
                           ", Filas " + attackerFormation.occupiedAttackingRows +
@@ -158,6 +204,43 @@ public class CombatResolver {
         return new AttackResult(hits > 0, totalDamage, hits, attacksAvailable);
     }
 
+    private static MoraleResolution resolveMoraleIfNeeded(CombatUnit defender, boolean hadStandardBeforeDamage) {
+        if (!defender.isAlive()) {
+            return MoraleResolution.notChecked();
+        }
+
+        boolean checkByHalfLoss = defender.shouldCheckMoraleFromHalfLoss();
+        boolean checkByStandardLoss = hadStandardBeforeDamage && !defender.hasStandardBearer();
+
+        if (!checkByHalfLoss && !checkByStandardLoss) {
+            return MoraleResolution.notChecked();
+        }
+
+        if (checkByHalfLoss) {
+            defender.markHalfLossMoraleChecked();
+        }
+
+        int moraleRoll = DiceRoller.roll2D6();
+        boolean passed = defender.checkMorale(moraleRoll);
+        return new MoraleResolution(true, passed, moraleRoll);
+    }
+
+    private static class MoraleResolution {
+        public final boolean checked;
+        public final boolean passed;
+        public final int roll;
+
+        public MoraleResolution(boolean checked, boolean passed, int roll) {
+            this.checked = checked;
+            this.passed = passed;
+            this.roll = roll;
+        }
+
+        public static MoraleResolution notChecked() {
+            return new MoraleResolution(false, true, 0);
+        }
+    }
+
     /**
      * Clase interna para representar el resultado de un ataque.
      */
@@ -166,12 +249,31 @@ public class CombatResolver {
         public final int damage;
         public final int hits;
         public final int totalAttacks;
+        public final boolean moraleChecked;
+        public final boolean moralePassed;
+        public final int moraleRoll;
+        public final boolean defenderFled;
 
         public AttackResult(boolean hit, int damage, int hits, int totalAttacks) {
+            this(hit, damage, hits, totalAttacks, false, true, 0, false);
+        }
+
+        public AttackResult(boolean hit,
+                            int damage,
+                            int hits,
+                            int totalAttacks,
+                            boolean moraleChecked,
+                            boolean moralePassed,
+                            int moraleRoll,
+                            boolean defenderFled) {
             this.hit = hit;
             this.damage = damage;
             this.hits = hits;
             this.totalAttacks = totalAttacks;
+            this.moraleChecked = moraleChecked;
+            this.moralePassed = moralePassed;
+            this.moraleRoll = moraleRoll;
+            this.defenderFled = defenderFled;
         }
 
         @Override

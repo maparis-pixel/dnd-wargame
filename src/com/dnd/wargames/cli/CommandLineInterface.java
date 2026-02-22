@@ -30,7 +30,21 @@ public class CommandLineInterface {
         this.characters = new ArrayList<>();
         this.units = new ArrayList<>();
         this.battleEngine = new WargameBattleEngine();
+        configureBattleDecisionProvider();
         this.inBattle = false;
+    }
+
+    private void configureBattleDecisionProvider() {
+        battleEngine.setDecisionProvider((attacker, fleeingUnit, hasAlternativeTarget) -> {
+            System.out.println("\n❓ " + fleeingUnit.getBattleDisplayName() + " huye. ¿" +
+                    attacker.getBattleDisplayName() + " persigue?");
+            if (hasAlternativeTarget) {
+                System.out.println("   Si no persigue, atacará otro objetivo disponible.");
+            }
+            System.out.print("   Responde [s/N]: ");
+            String answer = scanner.nextLine().trim().toLowerCase();
+            return answer.equals("s") || answer.equals("si") || answer.equals("sí") || answer.equals("y") || answer.equals("yes");
+        });
     }
 
     /**
@@ -316,6 +330,7 @@ public class CommandLineInterface {
     private void endBattle() {
         inBattle = false;
         battleEngine = new WargameBattleEngine(); // Reset
+        configureBattleDecisionProvider();
         System.out.println("🏁 Batalla terminada. Volviendo al menú principal.");
         System.out.println("Presiona Enter para continuar...");
         scanner.nextLine();

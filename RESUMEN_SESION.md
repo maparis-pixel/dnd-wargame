@@ -38,6 +38,19 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
 - ✅ Tests ampliados (`BasicTest`) para frente +2, recálculo y bono por filas
 - ✅ Documentación de perfiles y requisitos sincronizada con estado real
 
+### Decisiones cerradas para versión final
+- ✅ Sistema final en modo detallado (sin BR abstracto).
+- ✅ Escala táctica objetivo: 20 ft por casilla.
+- ✅ Falla de moral por 50%: estado Rota + retirada obligatoria.
+- ✅ Persecución tras huida: decisión manual en CLI.
+
+### Plan siguiente iteración (v3.2)
+1. Consolidar estados de unidad (`Normal`, `Rota`, `Huyendo`, `Reagrupada`).
+2. Restringir acciones de unidades rotas/huyendo y forzar retirada.
+3. Consolidar flujo perseguir/retarget y su salida en logs.
+4. Limitar reagrupamiento a un único intento con personaje aliado.
+5. Añadir pruebas de aceptación para moral, retirada y persecución.
+
 3. **Interfaz (cli/)**
    - CommandLineInterface: Menú interactivo completo
    - Gestión de personajes y unidades

@@ -438,6 +438,22 @@ THEN: Mismo número, PF, posiciones, estados se restauran
 
 ---
 
+## 7. Plan Funcional v3.2 y Decisiones Cerradas
+
+### Decisiones Cerradas
+- Se mantiene el **modo detallado** como sistema final principal.
+- Escala táctica objetivo: **20 ft** por casilla.
+- Fallo de moral por 50% de bajas: unidad **Rota** con retirada obligatoria.
+- Persecución post-huida: decisión manual de jugador en CLI.
+
+### Requisitos Funcionales de la Siguiente Iteración
+- FR-13: Estado `Rota` bloquea acciones ofensivas y fuerza retirada.
+- FR-14: Tras huida, el atacante elige entre perseguir o cambiar objetivo.
+- FR-15: Reagrupamiento posible una sola vez si hay personaje aliado en ruta.
+- FR-16: La salida de combate debe reportar chequeo de moral, retirada, persecución y reagrupamiento.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definición Inicial - 2026-02-08

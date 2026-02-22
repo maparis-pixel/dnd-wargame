@@ -644,6 +644,25 @@ Additional Notes:
 
 ---
 
+## 12. Plan QA v3.2 (Aceptación)
+
+### Decisiones a Verificar
+- Modelo detallado activo (sin BR).
+- Escala táctica declarada de 20 ft.
+- Moral a 50% produce estado `Rota` y retirada obligatoria.
+- Persecución se decide manualmente en CLI.
+
+### Casos de Aceptación Mínimos
+1. Unidad cae a 50% HP -> se ejecuta chequeo de moral y se muestra resultado.
+2. Falla moral -> unidad entra en retirada y no ejecuta ataque normal.
+3. Tras huida, el atacante recibe pregunta de persecución en CLI.
+4. Si no persigue y hay objetivo alternativo -> retarget correcto.
+5. Si persigue -> resolución de persecución + daño adicional solo si alcanza.
+6. Reagrupamiento disponible una sola vez con personaje aliado presente.
+7. Segundo intento de reagrupamiento no permitido.
+
+---
+
 ## Versión
 - v2.0 - Wargame Scale - Actualizado: 2026-02-08
 - v1.0 - Definido: 2026-02-08

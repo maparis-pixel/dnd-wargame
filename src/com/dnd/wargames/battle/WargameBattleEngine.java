@@ -20,6 +20,7 @@ public class WargameBattleEngine {
     private List<Combatant> initiativeOrder;
     private boolean battleActive;
     private int turnCounter;
+    private BattleDecisionProvider decisionProvider;
 
     /**
      * Constructor del motor de batalla.
@@ -32,6 +33,19 @@ public class WargameBattleEngine {
         this.initiativeOrder = new ArrayList<>();
         this.battleActive = false;
         this.turnCounter = 0;
+        this.decisionProvider = (attacker, fleeing, hasAlternativeTarget) -> false;
+    }
+
+    public interface BattleDecisionProvider {
+        boolean shouldPursue(CombatUnit attacker, CombatUnit fleeingUnit, boolean hasAlternativeTarget);
+    }
+
+    public void setDecisionProvider(BattleDecisionProvider decisionProvider) {
+        if (decisionProvider == null) {
+            this.decisionProvider = (attacker, fleeing, hasAlternativeTarget) -> false;
+            return;
+        }
+        this.decisionProvider = decisionProvider;
     }
 
     /**
@@ -209,6 +223,93 @@ public class WargameBattleEngine {
 
         // Mostrar resultado
         System.out.println("   Resultado: " + result);
+
+        if (result.defenderFled && defender.isUnit()) {
+            handleUnitRetreat(attacker, defender);
+        }
+    }
+
+    private void handleUnitRetreat(Combatant attacker, Combatant fleeingDefender) {
+        CombatUnit fleeingUnit = fleeingDefender.unit;
+        if (fleeingUnit == null || !fleeingUnit.hasFledBattle()) {
+            return;
+        }
+
+        System.out.println("   🏳️ " + fleeingUnit.getBattleDisplayName() + " está en retirada.");
+
+        if (attacker.isUnit() && attacker.unit.isAlive()) {
+            Combatant alternativeTarget = findTargetForExcludingUnit(attacker, fleeingUnit);
+            boolean hasAlternativeTarget = alternativeTarget != null;
+
+            boolean shouldPursue = decisionProvider.shouldPursue(attacker.unit, fleeingUnit, hasAlternativeTarget);
+
+            if (shouldPursue) {
+                System.out.println("   🏃 " + attacker.unit.getBattleDisplayName() + " intenta perseguir.");
+                if (isPursuitSuccessful(attacker.unit, fleeingUnit)) {
+                    System.out.println("   ✅ La persecución alcanza a la unidad en retirada.");
+                    CombatResolver.AttackResult pursuitResult = CombatResolver.resolveUnitVsUnit(attacker.unit, fleeingUnit);
+                    System.out.println("   Resultado persecución: " + pursuitResult);
+                } else {
+                    System.out.println("   ❌ La unidad en retirada escapa de la persecución.");
+                }
+            } else if (hasAlternativeTarget) {
+                System.out.println("   🔄 La unidad no persigue y cambia a otro objetivo.");
+                executeAttack(attacker, alternativeTarget);
+            }
+        }
+
+        attemptRegroupIfPossible(fleeingDefender);
+    }
+
+    private Combatant findTargetForExcludingUnit(Combatant attacker, CombatUnit excludedUnit) {
+        int targetTeam = (attacker.team == 1) ? 2 : 1;
+
+        for (Combatant c : initiativeOrder) {
+            if (c.team == targetTeam && c.isCharacter() && c.isAlive()) {
+                return c;
+            }
+        }
+
+        for (Combatant c : initiativeOrder) {
+            if (c.team == targetTeam && c.isUnit() && c.isAlive() && c.unit != excludedUnit) {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean isPursuitSuccessful(CombatUnit pursuer, CombatUnit fleeingUnit) {
+        int pursuerRoll = DiceRoller.rollD20() + Math.max(0, pursuer.getSpeedFeet() / 10);
+        int fleeingRoll = DiceRoller.rollD20() + Math.max(0, fleeingUnit.getSpeedFeet() / 10);
+
+        System.out.println("   Tirada persecución: " + pursuerRoll + " vs escape " + fleeingRoll);
+        return pursuerRoll >= fleeingRoll;
+    }
+
+    private void attemptRegroupIfPossible(Combatant fleeingDefender) {
+        if (!fleeingDefender.isUnit() || !fleeingDefender.unit.canAttemptRegroup()) {
+            return;
+        }
+
+        if (!hasLivingCharacterInTeam(fleeingDefender.team)) {
+            return;
+        }
+
+        int regroupRoll = DiceRoller.roll2D6();
+        boolean regrouped = fleeingDefender.unit.attemptRegroup(regroupRoll);
+
+        System.out.println("   🧭 Reagrupamiento por personaje aliado: 2d6=" + regroupRoll +
+                " vs " + fleeingDefender.unit.getMorale() + " -> " + (regrouped ? "SE REAGRUPA" : "NO SE REAGRUPA"));
+    }
+
+    private boolean hasLivingCharacterInTeam(int team) {
+        for (Combatant combatant : initiativeOrder) {
+            if (combatant.team == team && combatant.isCharacter() && combatant.isAlive()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -343,7 +444,7 @@ public class WargameBattleEngine {
         public boolean isUnit() { return unit != null; }
 
         public String getName() {
-            return isCharacter() ? character.getName() : unit.getName();
+            return isCharacter() ? character.getName() : unit.getBattleDisplayName();
         }
 
         public boolean isAlive() {

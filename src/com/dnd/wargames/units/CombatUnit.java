@@ -46,6 +46,8 @@ public class CombatUnit {
     private int morale;                 // Valor Warhammer 2-12
     private boolean hasStandardBearer;  // Porta estandarte
     private boolean hasFledBattle;      // Ha huido de la batalla
+    private boolean halfLossMoraleChecked;
+    private boolean regroupAttemptUsed;
 
     /**
      * Constructor básico para una unidad de combate.
@@ -70,6 +72,8 @@ public class CombatUnit {
         this.moraleStatus = MoraleEffect.NONE;
         this.hasStandardBearer = (creaturesCount >= 10); // Porta estandarte si >= 10 criaturas
         this.hasFledBattle = false;
+        this.halfLossMoraleChecked = false;
+        this.regroupAttemptUsed = false;
     }
 
     /**
@@ -101,6 +105,8 @@ public class CombatUnit {
         this.moraleStatus = MoraleEffect.NONE;
         this.hasStandardBearer = (creaturesCount >= 10);
         this.hasFledBattle = false;
+        this.halfLossMoraleChecked = false;
+        this.regroupAttemptUsed = false;
     }
 
     /**
@@ -393,6 +399,52 @@ public class CombatUnit {
         return passed;
     }
 
+    public boolean shouldCheckMoraleFromHalfLoss() {
+        return !halfLossMoraleChecked && hitPoints > 0 && hitPoints <= (maxHitPoints / 2);
+    }
+
+    public void markHalfLossMoraleChecked() {
+        this.halfLossMoraleChecked = true;
+    }
+
+    public boolean canAttemptRegroup() {
+        return hasFledBattle && !regroupAttemptUsed && hitPoints > 0;
+    }
+
+    public boolean attemptRegroup(int diceRoll) {
+        if (!canAttemptRegroup()) {
+            return false;
+        }
+
+        regroupAttemptUsed = true;
+
+        if (creatureType == CreatureType.SKELETON && morale >= 10) {
+            hasFledBattle = false;
+            moraleStatus = MoraleEffect.NONE;
+            return true;
+        }
+
+        boolean passed = diceRoll <= morale;
+        if (passed) {
+            hasFledBattle = false;
+            moraleStatus = MoraleEffect.NONE;
+        }
+
+        return passed;
+    }
+
+    public String getBattleDisplayName() {
+        if (name == null || name.isBlank()) {
+            return creaturesCount + " criaturas";
+        }
+
+        if (name.matches(".*\\(\\d+ criaturas\\).*$")) {
+            return name.replaceAll("\\(\\d+ criaturas\\)", "(" + creaturesCount + " criaturas)");
+        }
+
+        return name;
+    }
+
     /**
      * Actualiza el estado de moral según situación actual.
      */
@@ -452,6 +504,8 @@ public class CombatUnit {
     public int getMorale() { return morale; }
     public boolean hasStandardBearer() { return hasStandardBearer; }
     public boolean hasFledBattle() { return hasFledBattle; }
+    public boolean hasHalfLossMoraleChecked() { return halfLossMoraleChecked; }
+    public boolean hasUsedRegroupAttempt() { return regroupAttemptUsed; }
 
     // Setters
     public void setName(String name) { this.name = name; }
