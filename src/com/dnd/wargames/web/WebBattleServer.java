@@ -103,7 +103,9 @@ public class WebBattleServer {
         StringBuilder batchLog = new StringBuilder();
 
         while (executed < turnsToRun && session.isBattleActive()) {
+            int turnNumber = session.totalTurnsExecuted + 1;
             batchLog.append(captureTurnOutput(session.engine));
+            batchLog.append(formatEndOfTurnSummary(session, turnNumber));
             executed++;
             session.totalTurnsExecuted++;
         }
@@ -314,6 +316,10 @@ public class WebBattleServer {
 
         if (log != null && !log.isBlank()) {
             String trimmed = log.length() > 8000 ? log.substring(log.length() - 8000) : log;
+            String moraleLines = extractMoraleLines(trimmed);
+            html.append("<h3>Moral en este bloque</h3><pre>")
+                .append(escapeHtml(moraleLines.isBlank() ? "(Sin chequeos de moral en este bloque)" : moraleLines))
+                .append("</pre>");
             html.append("<h3>Detalle del bloque ejecutado</h3><pre>")
                 .append(escapeHtml(trimmed))
                 .append("</pre>");
@@ -344,6 +350,52 @@ public class WebBattleServer {
         }
         sb.append("</ul>");
         return sb.toString();
+    }
+
+    private String formatEndOfTurnSummary(BattleSession session, int turnNumber) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n=== Estado al final del turno ").append(turnNumber).append(" ===\n");
+        sb.append("Aliados:\n");
+        for (CombatUnit unit : session.team1Units) {
+            sb.append(" - ").append(formatUnitEndStatus(unit)).append("\n");
+        }
+        sb.append("Enemigos:\n");
+        for (CombatUnit unit : session.team2Units) {
+            sb.append(" - ").append(formatUnitEndStatus(unit)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    private String formatUnitEndStatus(CombatUnit unit) {
+        String state;
+        if (unit.getHitPoints() <= 0) {
+            state = "Derrotada";
+        } else if (unit.hasFledBattle()) {
+            state = unit.hasBrokenByHalfLoss() ? "Rota/Retirada" : "Retirada";
+        } else {
+            state = "En combate";
+        }
+
+        return unit.getBattleDisplayName()
+                + " | HP " + unit.getHitPoints() + "/" + unit.getMaxHitPoints()
+                + " (" + unit.getCreaturesCount() + " criaturas)"
+                + " | Moral: " + unit.getMoraleStatus()
+                + " | Estado: " + state;
+    }
+
+    private String extractMoraleLines(String log) {
+        if (log == null || log.isBlank()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String[] lines = log.split("\\R");
+        for (String line : lines) {
+            if (line.contains("[MORAL]")) {
+                sb.append(line).append("\n");
+            }
+        }
+        return sb.toString().trim();
     }
 
     private String resolveImageSource(String imagePath) {

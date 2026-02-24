@@ -1,8 +1,8 @@
 # D&D Wargames - Requisitos Funcionales
 
 **Estado:** Actualizado - Warhammer HP System  
-**Versión:** 3.0  
-**Fecha:** 2026-02-22
+**Versión:** 3.2  
+**Fecha:** 2026-02-24
 
 ---
 
@@ -142,25 +142,37 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
 - Mayor valor = más difícil fallar chequeo
 
 #### FR-4.2: Triggers de Chequeo de Moral
-Compañía debe realizar chequeo 2d6 vs moral cuando:
+Compania debe realizar chequeo 2d6 vs moral cuando:
 - **Porta Estandarte cae**: `hasStandardBearer` pasa de true → false
-- **50% de bajas**: HP actual ≤ 50% de HP máximo
 
-#### FR-4.3: Resolución del Chequeo
+#### FR-4.2.b: Rota por 50% (obligatorio)
+- **50% de bajas**: al cruzar 50% de HP, estado **Rota** y retirada obligatoria (sin tirada)
+
+#### FR-4.3: Resolucion del Chequeo
 - Tirar **2d6**
-- Si resultado ≤ valor de moral: **Pasa** (mantiene posición)
+- Si resultado ≤ valor de moral: **Pasa** (mantiene posicion)
 - Si resultado > valor de moral: **Falla** (huye del combate)
   - `hasFledBattle = true`
   - `moraleStatus = FRIGHTENED`
   - Unidad sale del combate (no puede atacar ni ser atacada)
 
-#### FR-4.4: Inmunidad al Miedo
+#### FR-4.4: Retirada obligatoria (Rota)
+- Al 50% de HP la unidad entra en estado **Rota** y se retira automaticamente.
+- `moraleStatus = BROKEN`
+- No hay tirada de moral en este caso.
+
+#### FR-4.5: Inmunidad al Miedo
 - **Skeleton** con moral ≥ 10: Automáticamente pasa chequeos (sin miedo)
 - Otras unidades no-muertas pueden tener inmunidad específica
 
-#### FR-4.5: Redirección tras Huida (Futura)
-- Ganador puede redirigir unidad victoriosa para ayudar a aliados
-- Requiere sistema de objectives/targeting dinámico
+#### FR-4.6: Persecucion o retarget tras huida
+- La unidad atacante decide si **persigue** a la unidad en huida.
+- Si no persigue y hay otro objetivo, puede **retarget** en el mismo turno.
+
+#### FR-4.7: Reagrupamiento
+- Una unidad en retirada puede intentar **reagruparse** una sola vez.
+- Requiere personaje aliado vivo en trayectoria.
+- Tirada **2d6** vs moral: si pasa, vuelve al combate.
 
 ### FR-5: Sistema de Magia a Gran Escala
 **Descripción**: Hechizos de personajes afectan a unidades, no a individuos
@@ -168,7 +180,7 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
 #### FR-5.1: Hechizos de Daño (Magos)
 - Bola de Fuego, Trueno, etc.
 - Unidad objetivo hace TS (Destreza, Constitución, etc.)
-- Si falla: Pierde PF = Nivel de Hechizo + Modificador de Inteligencia
+- Si falla: Pierde HP = Nivel de Hechizo + Modificador de Inteligencia
 - Si pasa: Mitad del daño
 
 #### FR-5.2: Hechizos de Control (Magos)
@@ -178,7 +190,7 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
 
 #### FR-5.3: Hechizos de Sostenimiento (Clérigos)
 - Palabra de Sanación Masiva:
-  - Recupera 1d4 PF a una unidad aliada
+  - Recupera 1d4 HP a una unidad aliada
   - Representa soldados rezagados que se reincorporan
 - Bendición Marcial:
   - Unidad suma 1d4 a tiradas de ataque y TS durante combate
@@ -189,12 +201,12 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
   - Unidad puede repetir 1 tirada de ataque fallida/turno
   - OR sumar dado de inspiración (ej. d8) al daño causado
 
-### FR-6: Sistema de Moral y Cohesión
+### FR-6: Sistema de Moral y Cohesion
 **Descripción**: Las unidades pueden romperse bajo presión
 
 #### FR-6.1: Chequeo de Moral
-- Unidad hace TS Sabiduría cuando:
-  - Pierde 50%+ de PF en un turno
+- Unidad hace TS Sabiduria cuando:
+  - Pierde 50%+ de HP en un turno
   - Su Líder muere
   - Aliados importantes huyen
 - CD 10 típicamente
@@ -210,17 +222,18 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
 ### FR-11: Interfaz Web de Configuración y Ejecución por Bloques
 **Descripción**: Permitir configurar batalla y ejecutar turnos desde navegador.
 
-#### FR-11.1: Configuración de compañías
+#### FR-11.1: Configuracion de companias
 - Mostrar tipos de unidad disponibles.
 - Para cada tipo, solicitar:
   - Equipo (`Aliados` o `Enemigos`)
-  - Número de compañías
-  - PF por compañía
+  - Numero de companias
+  - Criaturas por compania
 
-#### FR-11.2: Ejecución por bloques de turnos
+#### FR-11.2: Ejecucion por bloques de turnos
 - Solicitar cuántos turnos ejecutar de seguido.
 - Ejecutar el bloque solicitado.
 - Mostrar resultado parcial (estado + log del bloque).
+- Mostrar tiradas de moral y resumen de estado por turno.
 - Volver a solicitar nuevo número de turnos mientras la batalla siga activa.
 
 #### FR-11.3: Finalización
@@ -230,10 +243,10 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
 ### FR-12: Visualización de estadísticas de unidad
 **Descripción**: Mostrar el bloque de estadísticas de cada tipo de unidad en CLI y Web.
 
-#### FR-12.1: Campos mínimos visibles
+#### FR-12.1: Campos minimos visibles
 - AC
-- PF actual/máximo de compañía
-- HP por criatura + fórmula de dados
+- HP actual/maximo de compania
+- HP por criatura + formula de dados
 - Velocidad
 - STR/DEX/CON/INT/WIS/CHA
 - Ataque principal y secundario
@@ -280,7 +293,7 @@ Compañía debe realizar chequeo 2d6 vs moral cuando:
 #### FR-9.1: Guardar Batalla
 - Número y posición de unidades
 - HP de personajes individuales
-- PF de unidades
+- HP de unidades
 - Estados especiales (Asustada, Aturdida, etc.)
 - Historia de movimientos
 

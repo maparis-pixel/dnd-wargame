@@ -1,10 +1,10 @@
 # D&D Wargames - Simulador de Combate a Escala de Batallón
 
-**Versión**: 3.1 (Wargame Scale)  
+**Versión**: 3.2 (Wargame Scale)  
 **Interfaz**: CLI + Web
 **Estado**: ✅ **COMPLETAMENTE FUNCIONAL**
 
-## 📊 Estado Actual del Proyecto (22 Feb 2026)
+## 📊 Estado Actual del Proyecto (24 Feb 2026)
 
 ### ✅ **Sistema Completamente Implementado**
 - **Código compilado** ✓
@@ -26,12 +26,11 @@
   - frente de ataque limitado por frente enemigo +2 (con extensión si completa 2 filas)
   - bono por filas ocupadas: +2 por fila adicional
 
-### 🗺️ **Plan inmediato v3.2 (decisiones cerradas)**
-- Modo final: detallado (sin BR abstracto).
-- Escala táctica objetivo: 20 ft por casilla.
-- Moral al 50%: estado Rota + retirada obligatoria.
-- Persecución de unidades en huida: decisión manual en CLI.
-- Reagrupamiento: único intento con personaje aliado en trayectoria.
+### ✅ **v3.2 completado**
+- Moral al 50%: estado **Rota** + retirada obligatoria (sin tirada).
+- Persecucion de unidades en huida: decision manual en CLI.
+- Reagrupamiento: unico intento con personaje aliado en trayectoria.
+- Web: log con tiradas de moral + resumen de estado por turno.
 
 ### 🧩 **Plan siguiente v3.3 (alta de tipos por URL)**
 - Nueva página web para dar de alta tipos de unidad personalizados.
@@ -42,16 +41,16 @@
 ### 📁 **Archivos Clave**
 - `src/com/dnd/wargames/` - Código fuente completo
 - `run_system.bat` - Ejecución automática completa
-- `run_direct.bat` - Ejecución con rutas absolutas
+- `run_direct.bat` - Ejecucion directa portable (compila a bin)
 - `MANUAL_EJECUCION.txt` - Instrucciones detalladas
 - `EJECUTAR_AQUI.txt` - Guía rápida
 
 ### 🚀 **Cómo Continuar**
 Para retomar el desarrollo en futuras sesiones:
 
-1. **Ejecutar tests**: `java -cp src com.dnd.wargames.test.SimpleTest`
-2. **Ver demo**: `java -cp src com.dnd.wargames.demo.CombatDemo`
-3. **Usar CLI**: `java -cp src com.dnd.wargames.cli.CommandLineInterface`
+1. **Ejecutar tests**: `run_tests.bat`
+2. **Ver demo**: `run_direct.bat`
+3. **Usar CLI**: `run_system.bat`
 
 ### 💰 **Valor del Proyecto**
 - **Costo de desarrollo**: $1,000-3,000 USD
@@ -96,7 +95,7 @@ dnd_wargames/
 **Haz doble clic en `run_system.bat`** o ejecuta en terminal:
 
 ```cmd
-cd dnd_wargames
+cd dnd-wargame
 run_system.bat
 ```
 
@@ -104,28 +103,29 @@ Este script ejecutará automáticamente:
 1. ✅ **SimpleTest** - Verificación básica del sistema
 2. ✅ **BasicTest** - Tests completos de combate
 3. ✅ **CombatDemo** - Batalla automática guardias vs orcos
-4. ✅ **CommandLineInterface** - CLI interactivo completo
+4. ✅ **DndWargames** - CLI interactivo completo
 
 ### Opción 2: Ejecución Manual
 
-```bash
-cd dnd_wargames
+```cmd
+cd /d %~dp0
 
-# Ejecutar tests
-java -cp src com.dnd.wargames.test.SimpleTest
-java -cp src com.dnd.wargames.test.BasicTest
+rem Compilar a bin
+if not exist bin mkdir bin
+dir /s /b src\com\dnd\wargames\*.java > .sources.list
+javac -d bin @.sources.list
+del .sources.list
 
-# Ejecutar demo
-java -cp src com.dnd.wargames.demo.CombatDemo
+rem Ejecutar tests y demo
+java -cp bin com.dnd.wargames.test.SimpleTest
+java -cp bin com.dnd.wargames.test.BasicTest
+java -cp bin com.dnd.wargames.demo.CombatDemo
 
-# Ejecutar CLI interactivo
-java -cp src com.dnd.wargames.cli.CommandLineInterface
+rem Ejecutar app principal en modo CLI
+java -cp bin com.dnd.wargames.DndWargames
 
-# Ejecutar app principal en modo CLI
-java -cp src com.dnd.wargames.DndWargames
-
-# Ejecutar app principal en modo Web
-java -cp src com.dnd.wargames.DndWargames web
+rem Ejecutar app principal en modo Web
+java -cp bin com.dnd.wargames.DndWargames web
 ```
 
 Al iniciar modo Web, abre: `http://localhost:8080`
@@ -222,10 +222,11 @@ java -cp bin com.dnd.wargames.demo.CombatDemo
 - **Unidad vs Personaje**: Daño directo a HP del personaje
 
 #### Moral
-- El estado de moral cambia con PF restantes:
-  - **Enfurecido**: unidad con moral alta y casi intacta (>= 80% PF) → **+2 ataque**
-  - **Confundido**: unidad dañada (<= 50% PF) → **-1 ataque**
-  - **Asustado**: unidad al borde de colapso (<= 25% PF) → **-2 ataque**
+- El estado de moral cambia con HP restantes:
+  - **Enfurecido**: moral alta y casi intacta (>= 80% HP) → **+2 ataque**
+  - **Confundido**: unidad danada (<= 50% HP) → **-1 ataque**
+  - **Asustado**: unidad al borde de colapso (<= 25% HP) → **-2 ataque**
+  - **Rota**: al 50% exacto, retirada obligatoria (sin tirada)
   - **Normal**: sin modificador
 
 #### Sistema de Daño

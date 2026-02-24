@@ -2,7 +2,7 @@
 
 **Rol:** System Architect  
 **Responsabilidad:** Diseño de arquitectura, componentes y estructura del sistema  
-**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
+**Versión:** 3.2 (Warhammer HP System + Moral 50% Break + Pursuit)
 
 ---
 
@@ -50,7 +50,7 @@ com.dnd.wargames
 │   ├── CombatUnit.java         (Unidad HP por compañía) ★ v3.0
 │   ├── CharacterClass.java     (Guerrero, Mago, etc)
 │   ├── CreatureType.java       (Trasgo, Ogre, Skeleton, etc)
-│   ├── MoraleEffect.java       (NONE, FRIGHTENED, CONFUSED, RAGING)
+│   ├── MoraleEffect.java       (NONE, BROKEN, FRIGHTENED, CONFUSED, RAGING)
 │   └── UnitFactory.java        (Factory para crear unidades) ★ v3.0
 │
 ├── battle/                     (Sistema de combate)
@@ -188,12 +188,19 @@ WargameManager
 
 ### 3.4 Moral Operativa (estado actual)
 
-- El estado de moral se actualiza dinámicamente con PF restantes.
+- El estado de moral se actualiza dinamicamente con HP restantes.
+- Al 50% de HP: estado **BROKEN** y retirada obligatoria.
 - Efectos activos en ataque de unidad:
     - `RAGING`: +2 al ataque
     - `CONFUSED`: -1 al ataque
     - `FRIGHTENED`: -2 al ataque
 - Estos modificadores se aplican en `CombatResolver` para ataques de unidad vs unidad y unidad vs personaje.
+
+### 3.5 Persecucion y reagrupamiento (v3.2)
+
+- Si una unidad huye, el atacante puede decidir perseguir (CLI).
+- La persecucion permite atacar a unidades en retirada.
+- Reagrupamiento: un intento unico con personaje aliado vivo en trayectoria.
 ```
 
 ### 3.2 Sistema de Daño Asimétrico

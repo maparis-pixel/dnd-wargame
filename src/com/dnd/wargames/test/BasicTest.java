@@ -8,12 +8,12 @@ import com.dnd.wargames.battle.*;
  * Test básico para multi-ataques por formación y combat resolver.
  *
  * @author Lead Developer
- * @version 3.0
+ * @version 3.2
  */
 public class BasicTest {
 
     public static void main(String[] args) {
-        System.out.println("=== BasicTest v3.0: Multi-ataques y Combate ===\n");
+        System.out.println("=== BasicTest v3.2: Multi-ataques y Combate ===\n");
 
         boolean allTestsPassed = true;
 
@@ -204,6 +204,29 @@ public class BasicTest {
             System.out.println("✅ Bono por filas y escalado de alcance (10ft/15ft) validados");
         } catch (Exception e) {
             System.out.println("❌ Error en bono por filas/alcance: " + e.getMessage());
+            e.printStackTrace();
+            allTestsPassed = false;
+        }
+
+        // Test 8: Persecucion sobre unidad en retirada
+        System.out.println("\nTest 8: Persecucion sobre unidad en retirada");
+        try {
+            CombatUnit atacante = UnitFactory.createHumanGuards(10);
+            CombatUnit defensor = UnitFactory.createOrcs(10);
+
+            defensor.takeDamage(defensor.getMaxHitPoints() / 2);
+            if (!defensor.hasFledBattle()) {
+                throw new IllegalStateException("Defensor deberia estar en retirada");
+            }
+
+            CombatResolver.AttackResult pursuit = CombatResolver.resolveUnitVsUnitPursuit(atacante, defensor);
+            if (pursuit.totalAttacks <= 0) {
+                throw new IllegalStateException("Persecucion deberia generar ataques");
+            }
+
+            System.out.println("✅ Persecucion ejecutada (" + pursuit.totalAttacks + " ataques)");
+        } catch (Exception e) {
+            System.out.println("❌ Error en persecucion: " + e.getMessage());
             e.printStackTrace();
             allTestsPassed = false;
         }

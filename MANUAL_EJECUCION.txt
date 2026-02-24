@@ -9,25 +9,29 @@ Si el script automático no funciona, sigue estos pasos:
 
 2. EJECUTAR COMANDOS UNO POR UNO:
 
-   PRIMERO: Configurar Java
-   set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-25.0.2.10-hotspot
+   PRIMERO: Configurar Java (si no esta configurado)
+   set JAVA_HOME=C:\Ruta\A\Tu\JDK
    set PATH=%JAVA_HOME%\bin;%PATH%
 
-   SEGUNDO: Ir al directorio
-   cd C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+   SEGUNDO: Ir al directorio del proyecto
+   cd /d %~dp0
 
    TERCERO: Compilar (si es necesario)
-   "%JAVA_HOME%\bin\javac.exe" -cp src src\com\dnd\wargames\demo\CombatDemo.java
+   if not exist bin mkdir bin
+   dir /s /b src\com\dnd\wargames\*.java > .sources.list
+   "%JAVA_HOME%\bin\javac.exe" -d bin @.sources.list
+   del .sources.list
 
    CUARTO: Ejecutar tests
-   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.test.SimpleTest
-   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.test.BasicTest
+   "%JAVA_HOME%\bin\java.exe" -cp bin com.dnd.wargames.test.SimpleTest
+   "%JAVA_HOME%\bin\java.exe" -cp bin com.dnd.wargames.test.BasicTest
+   "%JAVA_HOME%\bin\java.exe" -cp bin com.dnd.wargames.test.MoraleAndWebSmokeTest
 
    QUINTO: Ejecutar la demo
-   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.demo.CombatDemo
+   "%JAVA_HOME%\bin\java.exe" -cp bin com.dnd.wargames.demo.CombatDemo
 
    SEXTO: Ejecutar CLI interactivo
-   "%JAVA_HOME%\bin\java.exe" -cp src com.dnd.wargames.cli.CommandLineInterface
+   "%JAVA_HOME%\bin\java.exe" -cp bin com.dnd.wargames.DndWargames
 
 LO QUE DEBERÍAS VER:
 ===================
@@ -74,10 +78,10 @@ PROBLEMAS COMUNES:
 
 2. "No se encuentra el archivo":
    - Verifica que estés en el directorio correcto
-   - Ruta: C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+   - Ruta: %~dp0
 
 3. Errores de compilación:
    - Los archivos ya deberían estar compilados
-   - Si no, ejecuta el comando de compilación
+   - Si no, ejecuta el comando de compilacion
 
 ¡ÉXITO! El sistema está funcionando correctamente.

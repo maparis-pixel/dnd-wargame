@@ -48,6 +48,7 @@ public class CombatUnit {
     private boolean hasFledBattle;      // Ha huido de la batalla
     private boolean halfLossMoraleChecked;
     private boolean regroupAttemptUsed;
+    private boolean brokenByHalfLoss;
 
     /**
      * Constructor básico para una unidad de combate.
@@ -74,6 +75,7 @@ public class CombatUnit {
         this.hasFledBattle = false;
         this.halfLossMoraleChecked = false;
         this.regroupAttemptUsed = false;
+        this.brokenByHalfLoss = false;
     }
 
     /**
@@ -107,6 +109,7 @@ public class CombatUnit {
         this.hasFledBattle = false;
         this.halfLossMoraleChecked = false;
         this.regroupAttemptUsed = false;
+        this.brokenByHalfLoss = false;
     }
 
     /**
@@ -353,6 +356,7 @@ public class CombatUnit {
      * Aplica daño a la unidad en HP.
      */
     public void takeDamage(int damage) {
+        int previousHitPoints = hitPoints;
         hitPoints = Math.max(0, hitPoints - damage);
         
         // Actualizar contador de criaturas según HP restante
@@ -368,6 +372,13 @@ public class CombatUnit {
                 hasStandardBearer = false;
             }
         }
+
+        boolean crossedHalfLoss = previousHitPoints > (maxHitPoints / 2) && hitPoints <= (maxHitPoints / 2);
+        if (crossedHalfLoss) {
+            applyHalfLossBreak();
+        }
+
+        updateMoraleStatus();
     }
 
     /**
@@ -400,7 +411,7 @@ public class CombatUnit {
     }
 
     public boolean shouldCheckMoraleFromHalfLoss() {
-        return !halfLossMoraleChecked && hitPoints > 0 && hitPoints <= (maxHitPoints / 2);
+        return !halfLossMoraleChecked && hitPoints > 0 && hitPoints <= (maxHitPoints / 2) && !brokenByHalfLoss;
     }
 
     public void markHalfLossMoraleChecked() {
@@ -421,6 +432,7 @@ public class CombatUnit {
         if (creatureType == CreatureType.SKELETON && morale >= 10) {
             hasFledBattle = false;
             moraleStatus = MoraleEffect.NONE;
+            brokenByHalfLoss = false;
             return true;
         }
 
@@ -428,6 +440,7 @@ public class CombatUnit {
         if (passed) {
             hasFledBattle = false;
             moraleStatus = MoraleEffect.NONE;
+            brokenByHalfLoss = false;
         }
 
         return passed;
@@ -450,7 +463,7 @@ public class CombatUnit {
      */
     private void updateMoraleStatus() {
         if (!isAlive() || hasFledBattle) {
-            moraleStatus = MoraleEffect.FRIGHTENED;
+            moraleStatus = brokenByHalfLoss ? MoraleEffect.BROKEN : MoraleEffect.FRIGHTENED;
             return;
         }
 
@@ -465,6 +478,17 @@ public class CombatUnit {
         } else {
             moraleStatus = MoraleEffect.NONE;
         }
+    }
+
+    private void applyHalfLossBreak() {
+        if (hasFledBattle) {
+            return;
+        }
+
+        hasFledBattle = true;
+        brokenByHalfLoss = true;
+        halfLossMoraleChecked = true;
+        moraleStatus = MoraleEffect.BROKEN;
     }
 
     /**
@@ -506,6 +530,7 @@ public class CombatUnit {
     public boolean hasFledBattle() { return hasFledBattle; }
     public boolean hasHalfLossMoraleChecked() { return halfLossMoraleChecked; }
     public boolean hasUsedRegroupAttempt() { return regroupAttemptUsed; }
+    public boolean hasBrokenByHalfLoss() { return brokenByHalfLoss; }
 
     // Setters
     public void setName(String name) { this.name = name; }

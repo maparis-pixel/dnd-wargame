@@ -12,3 +12,6 @@ Thumbs.db
 bin/
 out/
 target/
+
+# Runtime files
+.webserver.pid

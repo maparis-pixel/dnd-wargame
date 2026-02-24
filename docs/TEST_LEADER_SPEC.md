@@ -2,7 +2,7 @@
 
 **Rol:** Test Lead / QA Lead  
 **Responsabilidad:** Estrategia de testing, casos de prueba y validación  
-**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
+**Versión:** 3.2 (Warhammer HP System + Moral 50% Break + Pursuit)
 
 ---
 
@@ -26,9 +26,7 @@ En este repositorio, cada iteración debe ejecutar:
 
 1. **Compilación completa** del proyecto: `Compile D&D Wargames` task.
 2. **Suite mínima obligatoria** (1 única ejecución completa):
-  - `com.dnd.wargames.test.SimpleTest` (HP system, formación básica)
-  - `com.dnd.wargames.test.BasicTest` (multi-ataques, moral Warhammer)
-  - `com.dnd.wargames.test.MoraleAndWebSmokeTest` (2d6 moral, web instantiation)
+  - `run_tests.bat`
 
 Si cualquier punto falla, la iteración no se considera válida.
 
@@ -38,7 +36,8 @@ Cobertura mínima adicional de dominio v3.0:
   - **Alcance** (5ft estándar, 10ft Ogre)
   - **Formación**: `frontWidth`, `rowsAttacking` (5ft=1, 10ft=2, 15ft=3)
 - Validar `getAttacksAvailable()` = frontWidth × rowsAttacking
-- Validar `checkMorale(2d6)` con triggers: porta estandarte, 50% HP
+- Validar `checkMorale(2d6)` con triggers: porta estandarte
+- Validar **Rota al 50%** con retirada obligatoria (sin tirada)
 
 Cobertura adicional obligatoria v3.1:
 - Validar `getFormationProfileAgainst(enemyFront)`:
@@ -48,13 +47,17 @@ Cobertura adicional obligatoria v3.1:
 - Validar bono por filas ocupadas: +2 por fila desde la segunda.
 - Validar modelo de turno del motor: 1 turno = ronda de aliados + ronda de enemigos.
 
+Cobertura adicional obligatoria v3.2:
+- Validar persecucion permite atacar unidades en retirada.
+- Validar reagrupamiento unico con personaje aliado.
+
 ---
 
 ## 2. Unit Testing Specification
 
 ### 2.1 Framework & Tools
 - **Estado actual en repo**: Tests ejecutables por clase `main` (sin JUnit)
-- **Ejecución**: `java -cp src <test-class>`
+- **Ejecucion**: `run_tests.bat`
 - **Cobertura mínima funcional**: smoke + validaciones de mecánicas core (HP + formación + moral 2d6)
 
 Nota: La adopción de JUnit puede planificarse como mejora futura, pero la validación actual obligatoria se realiza con tests `main`.

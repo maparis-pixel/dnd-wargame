@@ -247,7 +247,7 @@ public class WargameBattleEngine {
                 System.out.println("   🏃 " + attacker.unit.getBattleDisplayName() + " intenta perseguir.");
                 if (isPursuitSuccessful(attacker.unit, fleeingUnit)) {
                     System.out.println("   ✅ La persecución alcanza a la unidad en retirada.");
-                    CombatResolver.AttackResult pursuitResult = CombatResolver.resolveUnitVsUnit(attacker.unit, fleeingUnit);
+                    CombatResolver.AttackResult pursuitResult = CombatResolver.resolveUnitVsUnitPursuit(attacker.unit, fleeingUnit);
                     System.out.println("   Resultado persecución: " + pursuitResult);
                 } else {
                     System.out.println("   ❌ La unidad en retirada escapa de la persecución.");

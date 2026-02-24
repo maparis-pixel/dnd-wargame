@@ -8,6 +8,7 @@ package com.dnd.wargames.units;
  */
 public enum MoraleEffect {
     NONE("Normal"),
+    BROKEN("Rota"),
     FRIGHTENED("Asustado"),
     CONFUSED("Confundido"),
     RAGING("Enfurecido");

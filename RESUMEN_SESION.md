@@ -1,8 +1,8 @@
 # D&D Wargames - Resumen de Sesión
-## Fecha: 22 de Febrero de 2026
+## Fecha: 24 de Febrero de 2026
 
 ## 🎯 OBJETIVO ALCANZADO
-Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizadas y validadas.
+Sistema D&D Wargames v3.2 funcional con moral al 50%, retirada obligatoria y mejoras en el modo web.
 
 ## ✅ LO QUE SE COMPLETÓ
 
@@ -23,7 +23,13 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
    - CombatResolver: Resolución asimétrica de combate
    - WargameBattleEngine: Motor de turnos e iniciativa
 
-### Avances de esta sesión (22-02-2026)
+### Avances de esta sesión (24-02-2026)
+- ✅ Moral al 50% ahora es **Rota** con retirada obligatoria (sin tirada)
+- ✅ Persecucion manual en CLI con ataque valido a unidades en huida
+- ✅ Reagrupamiento unico con personaje aliado en trayectoria
+- ✅ Web: se muestran tiradas de moral y resumen de estado por turno
+- ✅ run_direct.bat portable (compila todo a bin)
+- ✅ Instrucciones de ejecucion portables (%~dp0)
 - ✅ Filas por alcance actualizadas:
    - 5ft = 1 fila
    - 10ft = 2 filas
@@ -40,16 +46,17 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
 
 ### Decisiones cerradas para versión final
 - ✅ Sistema final en modo detallado (sin BR abstracto).
-- ✅ Escala táctica objetivo: 20 ft por casilla.
-- ✅ Falla de moral por 50%: estado Rota + retirada obligatoria.
-- ✅ Persecución tras huida: decisión manual en CLI.
+- ✅ Escala tactica objetivo: 20 ft por casilla.
+- ✅ Moral 50%: estado Rota + retirada obligatoria.
+- ✅ Persecucion tras huida: decision manual en CLI.
+- ✅ Reagrupamiento unico con personaje aliado en trayectoria.
 
-### Plan siguiente iteración (v3.2)
-1. Consolidar estados de unidad (`Normal`, `Rota`, `Huyendo`, `Reagrupada`).
-2. Restringir acciones de unidades rotas/huyendo y forzar retirada.
-3. Consolidar flujo perseguir/retarget y su salida en logs.
-4. Limitar reagrupamiento a un único intento con personaje aliado.
-5. Añadir pruebas de aceptación para moral, retirada y persecución.
+### Plan siguiente iteración (v3.3)
+1. Crear pagina web de alta de tipos de unidad personalizados.
+2. Permitir importacion desde URL de ficha D&D.
+3. Definir interfaz de entrada normalizada para datos importados.
+4. Integrar agente de transformacion URL -> interfaz.
+5. Guardar y reutilizar tipos nuevos en creacion de unidades.
 
 ### Nueva línea de desarrollo acordada (v3.3)
 1. Crear página web de alta de tipos de unidad personalizados.
@@ -75,11 +82,11 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
 - ✅ Errores de sintaxis (llaves faltantes)
 - ✅ Scripts de ejecución creados
 
-### Estado de Ejecución
-- **SimpleTest**: ✅ Ejecutándose correctamente (exit code 0)
+### Estado de Ejecucion
+- **SimpleTest**: ✅ Ejecutandose correctamente (exit code 0)
 - **Sistema completo**: Compilado y listo para ejecutar
-- **Scripts disponibles**: run_system.bat, run_direct.bat
-- **Documentación**: README actualizado, guías de ejecución
+- **Scripts disponibles**: run_system.bat, run_direct.bat, run_tests.bat
+- **Documentacion**: README y guias de ejecucion actualizadas
 
 ## 🚀 PRÓXIMAS SESIONES POSIBLES
 
@@ -117,4 +124,4 @@ Sistema D&D Wargames funcional con reglas de formación e iniciativa actualizada
 
 ---
 **Estado**: PROYECTO COMPLETAMENTE FUNCIONAL Y LISTO PARA EXPANSIÓN
-**Última ejecución**: run_tests.bat exitoso (SimpleTest, BasicTest, MoraleAndWebSmokeTest y CombatDemo)
+**Ultima ejecucion**: run_direct.bat exitoso (SimpleTest, BasicTest, CombatDemo, CLI)

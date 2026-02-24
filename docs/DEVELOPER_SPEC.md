@@ -2,7 +2,7 @@
 
 **Rol:** Lead Developer  
 **Responsabilidad:** Implementación, coding standards y especificaciones técnicas  
-**Versión:** 3.1 (Warhammer HP System + Front/Rows Initiative Update)
+**Versión:** 3.2 (Warhammer HP System + Moral 50% Break + Pursuit)
 
 ---
 
@@ -15,9 +15,7 @@ Para cada cambio funcional o técnico:
 1. **Actualizar documentación** de rol y requisitos impactados (`docs/*.md`).
 2. **Compilar proyecto** completo: `Compile D&D Wargames` task.
 3. **Ejecutar validación mínima obligatoria** (tests actualizados a HP system):
-    - `java -cp src com.dnd.wargames.test.SimpleTest`
-    - `java -cp src com.dnd.wargames.test.BasicTest`
-    - `java -cp src com.dnd.wargames.test.MoraleAndWebSmokeTest` (actualizado a 2d6)
+    - `run_tests.bat`
 4. **No cerrar iteración si hay fallos.**
 
 Checklist mínimo por PR/iteración:
@@ -41,6 +39,11 @@ Addendum técnico v3.1 (obligatorio):
 - [x] Bono por filas ocupadas: `+2 * (filasOcupadas - 1)`.
 - [x] Tras cada `takeDamage`, se recalculan criaturas y formación antes del siguiente ataque.
 - [x] Iniciativa: tirada única por combatiente; turno = 2 rondas (equipos alternos).
+
+Addendum tecnico v3.2 (obligatorio):
+- [x] Al 50% HP: estado `BROKEN` y retirada obligatoria (sin tirada).
+- [x] La persecucion debe poder atacar unidades en retirada.
+- [x] Reagrupamiento: un solo intento con personaje aliado en trayectoria.
 
 ### 1.1 Naming Conventions
 - **Clases**: PascalCase (`Character`, `BattleEngine`)

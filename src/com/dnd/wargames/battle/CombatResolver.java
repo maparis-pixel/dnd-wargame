@@ -21,7 +21,21 @@ public class CombatResolver {
      * @return Resultado del ataque
      */
     public static AttackResult resolveUnitVsUnit(CombatUnit attacker, CombatUnit defender) {
-        if (!attacker.isAlive() || !defender.isAlive()) {
+        return resolveUnitVsUnitInternal(attacker, defender, false);
+    }
+
+    public static AttackResult resolveUnitVsUnitPursuit(CombatUnit attacker, CombatUnit defender) {
+        return resolveUnitVsUnitInternal(attacker, defender, true);
+    }
+
+    private static AttackResult resolveUnitVsUnitInternal(CombatUnit attacker, CombatUnit defender, boolean allowFleeingDefender) {
+        if (!attacker.isAlive()) {
+            return new AttackResult(false, 0, 0, 0);
+        }
+        if (defender.getHitPoints() <= 0) {
+            return new AttackResult(false, 0, 0, 0);
+        }
+        if (!allowFleeingDefender && !defender.isAlive()) {
             return new AttackResult(false, 0, 0, 0);
         }
 
@@ -69,16 +83,20 @@ public class CombatResolver {
             boolean hadStandardBeforeDamage = defender.hasStandardBearer();
             defender.takeDamage(totalDamage);
 
-            MoraleResolution moraleResolution = resolveMoraleIfNeeded(defender, hadStandardBeforeDamage);
-            moraleChecked = moraleResolution.checked;
-            moralePassed = moraleResolution.passed;
-            moraleRoll = moraleResolution.roll;
+            if (!allowFleeingDefender) {
+                MoraleResolution moraleResolution = resolveMoraleIfNeeded(defender, hadStandardBeforeDamage);
+                moraleChecked = moraleResolution.checked;
+                moralePassed = moraleResolution.passed;
+                moraleRoll = moraleResolution.roll;
 
-            if (moraleChecked) {
-                System.out.println("   🧠 Chequeo de moral (2d6): " + moraleRoll +
-                        " vs " + defender.getMorale() + " -> " + (moralePassed ? "PASA" : "FALLA"));
-                if (!moralePassed) {
-                    System.out.println("   🏳️ " + defender.getBattleDisplayName() + " huye del combate.");
+                if (moraleResolution.forcedBreak) {
+                    System.out.println("   [MORAL] " + defender.getBattleDisplayName() + " se rompe al 50% y se retira.");
+                } else if (moraleChecked) {
+                    System.out.println("   [MORAL] Chequeo (2d6): " + moraleRoll +
+                            " vs " + defender.getMorale() + " -> " + (moralePassed ? "PASA" : "FALLA"));
+                    if (!moralePassed) {
+                        System.out.println("   [MORAL] " + defender.getBattleDisplayName() + " huye del combate.");
+                    }
                 }
             }
         } else {
@@ -133,11 +151,13 @@ public class CombatResolver {
             defender.takeDamage(damage);
 
             MoraleResolution moraleResolution = resolveMoraleIfNeeded(defender, hadStandardBeforeDamage);
-            if (moraleResolution.checked) {
-                System.out.println("   🧠 Chequeo de moral (2d6): " + moraleResolution.roll +
+            if (moraleResolution.forcedBreak) {
+                System.out.println("   [MORAL] " + defender.getBattleDisplayName() + " se rompe al 50% y se retira.");
+            } else if (moraleResolution.checked) {
+                System.out.println("   [MORAL] Chequeo (2d6): " + moraleResolution.roll +
                         " vs " + defender.getMorale() + " -> " + (moraleResolution.passed ? "PASA" : "FALLA"));
                 if (!moraleResolution.passed) {
-                    System.out.println("   🏳️ " + defender.getBattleDisplayName() + " huye del combate.");
+                    System.out.println("   [MORAL] " + defender.getBattleDisplayName() + " huye del combate.");
                 }
             }
 
@@ -212,6 +232,10 @@ public class CombatResolver {
         boolean checkByHalfLoss = defender.shouldCheckMoraleFromHalfLoss();
         boolean checkByStandardLoss = hadStandardBeforeDamage && !defender.hasStandardBearer();
 
+        if (defender.hasBrokenByHalfLoss()) {
+            return MoraleResolution.forcedBreak();
+        }
+
         if (!checkByHalfLoss && !checkByStandardLoss) {
             return MoraleResolution.notChecked();
         }
@@ -222,22 +246,28 @@ public class CombatResolver {
 
         int moraleRoll = DiceRoller.roll2D6();
         boolean passed = defender.checkMorale(moraleRoll);
-        return new MoraleResolution(true, passed, moraleRoll);
+        return new MoraleResolution(true, passed, moraleRoll, false);
     }
 
     private static class MoraleResolution {
         public final boolean checked;
         public final boolean passed;
         public final int roll;
+        public final boolean forcedBreak;
 
-        public MoraleResolution(boolean checked, boolean passed, int roll) {
+        public MoraleResolution(boolean checked, boolean passed, int roll, boolean forcedBreak) {
             this.checked = checked;
             this.passed = passed;
             this.roll = roll;
+            this.forcedBreak = forcedBreak;
         }
 
         public static MoraleResolution notChecked() {
-            return new MoraleResolution(false, true, 0);
+            return new MoraleResolution(false, true, 0, false);
+        }
+
+        public static MoraleResolution forcedBreak() {
+            return new MoraleResolution(true, false, 0, true);
         }
     }
 

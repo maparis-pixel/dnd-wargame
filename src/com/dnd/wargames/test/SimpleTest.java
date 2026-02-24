@@ -7,11 +7,11 @@ import com.dnd.wargames.battle.DiceRoller;
 /**
  * Test simple para validar sistema HP por compañía y formación.
  * 
- * @version 3.0
+ * @version 3.2
  */
 public class SimpleTest {
     public static void main(String[] args) {
-        System.out.println("=== SimpleTest v3.0: HP System + Formación ===\n");
+        System.out.println("=== SimpleTest v3.2: HP System + Formacion ===\n");
 
         // Test 1: Crear unidad con HP por compañía
         System.out.println("Test 1: Crear compañía de 10 Orcos");
@@ -57,8 +57,28 @@ public class SimpleTest {
         }
         System.out.println("✅ PASS: Tras " + damageDealt + " HP daño, quedan " + orcs.getCreaturesCount() + " criaturas");
 
-        // Test 4: Moral Warhammer 2d6
-        System.out.println("\nTest 4: Sistema de moral Warhammer 2d6");
+        // Test 4: Rota al 50% (retirada obligatoria)
+        System.out.println("\nTest 4: Rota al 50% (retirada obligatoria)");
+        CombatUnit orcsBreak = UnitFactory.createOrcs(10);
+        int breakDamage = orcsBreak.getMaxHitPoints() / 2;
+        orcsBreak.takeDamage(breakDamage);
+
+        if (!orcsBreak.hasFledBattle()) {
+            System.out.println("❌ FAIL: La unidad deberia estar en retirada al 50%");
+            System.exit(1);
+        }
+        if (!orcsBreak.hasBrokenByHalfLoss()) {
+            System.out.println("❌ FAIL: Se esperaba estado Rota por 50%");
+            System.exit(1);
+        }
+        if (!"Rota".equals(orcsBreak.getMoraleStatus().toString())) {
+            System.out.println("❌ FAIL: MoralStatus esperado Rota, obtenido " + orcsBreak.getMoraleStatus());
+            System.exit(1);
+        }
+        System.out.println("✅ PASS: Rota al 50% aplicada correctamente");
+
+        // Test 5: Moral Warhammer 2d6
+        System.out.println("\nTest 5: Sistema de moral Warhammer 2d6");
         int morale = orcs.getMorale();
         System.out.println("  Valor de moral Orco: " + morale);
         
@@ -68,19 +88,19 @@ public class SimpleTest {
         boolean passed = orcs.checkMorale(roll2d6);
         
         if (roll2d6 <= morale && !passed) {
-            System.out.println("❌ FAIL: Debió pasar el chequeo (roll " + roll2d6 + " <= moral " + morale + ")");
+            System.out.println("❌ FAIL: Debio pasar el chequeo (roll " + roll2d6 + " <= moral " + morale + ")");
             System.exit(1);
         }
         if (roll2d6 > morale && passed) {
-            System.out.println("❌ FAIL: Debió fallar el chequeo (roll " + roll2d6 + " > moral " + morale + ")");
+            System.out.println("❌ FAIL: Debio fallar el chequeo (roll " + roll2d6 + " > moral " + morale + ")");
             System.exit(1);
         }
         
-        String result = passed ? "Pasa (mantiene posición)" : "Falla (huye)";
+        String result = passed ? "Pasa (mantiene posicion)" : "Falla (huye)";
         System.out.println("✅ PASS: Chequeo moral " + result);
 
-        // Test 5: Ogre con reach 10ft = 2 filas
-        System.out.println("\nTest 5: Ogre con alcance 10ft (2 filas atacantes)");
+        // Test 6: Ogre con reach 10ft = 2 filas
+        System.out.println("\nTest 6: Ogre con alcance 10ft (2 filas atacantes)");
         CombatUnit ogres = UnitFactory.createOgres(5);
         
         if (ogres.getReachFeet() != 10) {

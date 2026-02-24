@@ -7,12 +7,12 @@ import com.dnd.wargames.web.WebBattleServer;
 
 /**
  * Smoke test para validar moral Warhammer 2d6 y disponibilidad del modo web.
- * @version 3.0
+ * @version 3.2
  */
 public class MoraleAndWebSmokeTest {
 
     public static void main(String[] args) {
-        System.out.println("=== MORALE 2D6 + WEB SMOKE TEST v3.0 ===\n");
+        System.out.println("=== MORALE 2D6 + WEB SMOKE TEST v3.2 ===\n");
 
         boolean passed = true;
 
@@ -44,9 +44,35 @@ public class MoraleAndWebSmokeTest {
             e.printStackTrace();
         }
 
-        // Test 2: Web instantiation
+        // Test 2: Rota al 50% y reagrupamiento unico
         try {
-            System.out.println("\nTest 2: Instanciación WebBattleServer");
+            System.out.println("\nTest 2: Rota al 50% y reagrupamiento");
+            CombatUnit guards = UnitFactory.createHumanGuards(10);
+            int breakDamage = guards.getMaxHitPoints() / 2;
+            guards.takeDamage(breakDamage);
+
+            if (!guards.hasBrokenByHalfLoss() || !guards.hasFledBattle()) {
+                throw new IllegalStateException("La unidad deberia estar Rota y en retirada");
+            }
+            if (!guards.canAttemptRegroup()) {
+                throw new IllegalStateException("Deberia permitir reagrupamiento unico");
+            }
+
+            boolean regrouped = guards.attemptRegroup(guards.getMorale());
+            if (!regrouped || guards.hasFledBattle()) {
+                throw new IllegalStateException("La unidad deberia reagruparse correctamente");
+            }
+
+            System.out.println("✅ Rota al 50% y reagrupamiento OK");
+        } catch (Exception e) {
+            passed = false;
+            System.out.println("❌ Error en Rota/reagrupamiento: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Test 3: Web instantiation
+        try {
+            System.out.println("\nTest 3: Instanciación WebBattleServer");
             WebBattleServer server = new WebBattleServer();
             if (server == null) {
                 throw new IllegalStateException("No se pudo instanciar WebBattleServer");

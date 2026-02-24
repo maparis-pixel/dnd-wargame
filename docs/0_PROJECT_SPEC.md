@@ -32,7 +32,7 @@ docs/
 └── ../RESUMEN_SESION.md            (Avances y estado de sesión)
 ```
 
-## Estado Actual de Combate (2026-02-22)
+## Estado Actual de Combate (2026-02-24)
 
 - Filas atacantes por alcance: **5ft = 1**, **10ft = 2**, **15ft = 3**.
 - Ataques de unidad calculados contra frente enemigo con tope inicial **frente enemigo + 2**.
@@ -40,6 +40,9 @@ docs/
 - Bono por filas ocupadas: **+2 al ataque por fila a partir de la primera**.
 - Daño actualiza criaturas y se recalculan frente/filas/ataques en el mismo combate.
 - Modelo de turno: **1 turno = 2 rondas** (equipo con mayor iniciativa viva primero, luego el otro).
+- Moral al 50%: **Rota** con retirada obligatoria (sin tirada).
+- Reagrupamiento unico con personaje aliado en trayectoria.
+- Persecucion manual tras huida en CLI.
 
 ## Cómo Usar Este Sistema
 
@@ -58,9 +61,7 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 	- `REQUIREMENTS.md` (si aplica)
 2. Compilar el proyecto completo.
 3. Ejecutar la suite mínima de validación funcional:
-	- `com.dnd.wargames.test.SimpleTest`
-	- `com.dnd.wargames.test.BasicTest`
-	- `com.dnd.wargames.test.MoraleAndWebSmokeTest`
+	- `run_tests.bat`
 4. Si falla compilación o tests, corregir y repetir.
 
 ## Versión
@@ -74,20 +75,13 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 - README general: [../README.md](../README.md)
 - Código fuente: `src/com/dnd/wargames/`
 
-## Plan v3.2 (Decisiones Cerradas)
+## v3.2 (Completado)
 
-### Decisiones Finales
-- Modelo final: **detallado** (sin BR abstracto de UA 2017).
-- Escala base: **20 ft por casilla** y **1 minuto por ronda**.
-- Moral por 50% de bajas: estado **Rota** con **retirada obligatoria**.
-- Persecución tras huida: **decisión manual** del jugador en CLI.
-
-### Plan de Implementación
-1. Formalizar estados de unidad: `Normal`, `Rota`, `Huyendo`, `Reagrupada`.
-2. Restringir acciones de unidad rota a retirada/reagrupamiento.
-3. Consolidar flujo de persecución o retarget manual tras huida.
-4. Limitar reagrupamiento a un intento, asistido por personaje aliado.
-5. Añadir pruebas de aceptación de moral, retirada y persecución.
+### Alcance entregado
+- Moral al 50%: estado **Rota** con retirada obligatoria.
+- Persecucion manual tras huida en CLI y ataque de persecucion valido.
+- Reagrupamiento unico con personaje aliado en trayectoria.
+- Web: log con tiradas de moral y resumen de estado por turno.
 
 ## Plan v3.3 (Nuevas Unidades desde URL)
 
@@ -110,3 +104,4 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 - 2026-02-22: Sincronización de reglas de combate (filas por alcance, frente enemigo +2, bono por filas, turnos por 2 rondas).
 - 2026-02-22: Política de iteración y suite mínima de validación consolidada.
 - 2026-02-22: Plan v3.3 añadido (alta de unidades desde URL mediante agente).
+- 2026-02-24: v3.2 completado (Rota al 50%, persecucion manual, reagrupamiento y mejoras web).

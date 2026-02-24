@@ -9,16 +9,14 @@ INSTRUCCIONES PARA EJECUTAR D&D WARGAMES
    - O busca "Símbolo del sistema" en el menú Inicio
 
 2. NAVEGAR AL DIRECTORIO:
-   cd C:\OneDrivePersonal\OneDrive\VS_Workspace\dnd_wargames
+   cd /d %~dp0
 
 3. EJECUTAR EL SISTEMA:
    run_system.bat
 
    O ejecuta manualmente:
-   java -cp src com.dnd.wargames.test.SimpleTest
-   java -cp src com.dnd.wargames.test.BasicTest
-   java -cp src com.dnd.wargames.demo.CombatDemo
-   java -cp src com.dnd.wargames.cli.CommandLineInterface
+   run_tests.bat
+   run_direct.bat
 
 LO QUE VERÁS:
 =============
@@ -47,6 +45,6 @@ Guarda 2 ataca a Orco 2: ¡Fallo!
 Si ves errores, verifica:
 - Que tienes JDK instalado
 - Que estás en el directorio correcto
-- Que el proyecto está compilado (archivos .class en src/)
+- Que el proyecto está compilado (archivos .class en bin/)
 
 ¡DISFRUTA TU SISTEMA D&D WARGAMES!
