@@ -100,8 +100,29 @@ Cada cambio de código debe cumplir este flujo en el mismo ciclo de trabajo:
 - Adaptador de agente URL -> esquema de unidad.
 - Persistencia de tipos personalizados.
 
+## Plan v3.4 (Despliegue Cloud en AKS - Azure for Students)
+
+### Objetivo
+- Publicar el modo web del proyecto en AKS usando suscripción de estudiante y coste mínimo.
+
+### Alcance inicial (MVP cloud)
+1. Containerizar la aplicación web.
+2. Desplegar en AKS con 1 nodo y configuración mínima.
+3. Exponer servicio vía Ingress.
+4. Definir controles básicos de coste y operación.
+
+### Restricciones
+- AKS no es 100% gratis permanente: se consume crédito de estudiante.
+- Prioridad a simplicidad operativa: sin microservicios en primera fase.
+
+### Entregables por rol
+- Architect: blueprint AKS + topología de despliegue mínima.
+- Developer: Dockerfile, manifests y parametrización por variables de entorno.
+- Test Lead: smoke tests post-deploy y checklist de validación en entorno cloud.
+
 ## Changelog Corto
 - 2026-02-22: Sincronización de reglas de combate (filas por alcance, frente enemigo +2, bono por filas, turnos por 2 rondas).
 - 2026-02-22: Política de iteración y suite mínima de validación consolidada.
 - 2026-02-22: Plan v3.3 añadido (alta de unidades desde URL mediante agente).
 - 2026-02-24: v3.2 completado (Rota al 50%, persecucion manual, reagrupamiento y mejoras web).
+- 2026-03-01: añadido plan v3.4 para despliegue AKS con Azure for Students (MVP cloud + control de costes).

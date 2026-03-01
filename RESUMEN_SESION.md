@@ -125,3 +125,29 @@ Sistema D&D Wargames v3.2 funcional con moral al 50%, retirada obligatoria y mej
 ---
 **Estado**: PROYECTO COMPLETAMENTE FUNCIONAL Y LISTO PARA EXPANSIÓN
 **Ultima ejecucion**: run_direct.bat exitoso (SimpleTest, BasicTest, CombatDemo, CLI)
+
+---
+
+## Actualización de planificación cloud
+## Fecha: 01 de Marzo de 2026
+
+### ☁️ Plan aprobado: AKS con Azure for Students
+- Se define línea de trabajo para desplegar el modo Web en entorno cloud de bajo coste.
+- Se confirma uso de suscripción Azure for Students (crédito limitado).
+
+### Alcance MVP cloud
+1. Containerizar la aplicación web.
+2. Desplegar en AKS (`tier free`) con 1 nodo pequeño.
+3. Exponer mediante `Service` + `Ingress`.
+4. Añadir health checks y smoke test post-deploy.
+
+### Restricciones y gobierno de coste
+- AKS no se considera gratuito permanente: consumir solo dentro del crédito de estudiante.
+- Configuración inicial minimalista (sin HA ni componentes premium).
+- Presupuesto y alertas de coste como requisito operativo.
+
+### Próximos entregables documentales/técnicos
+- `Dockerfile` del modo web.
+- Manifiestos Kubernetes base.
+- Guía de despliegue AKS paso a paso.
+- Checklist QA para validación en cloud.

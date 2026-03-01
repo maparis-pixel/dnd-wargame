@@ -51,6 +51,14 @@ Cobertura adicional obligatoria v3.2:
 - Validar persecucion permite atacar unidades en retirada.
 - Validar reagrupamiento unico con personaje aliado.
 
+Cobertura adicional planificada v3.4 (AKS Azure for Students):
+- Validar despliegue web en AKS con manifiestos mínimos.
+- Validar health checks (`/health/live`, `/health/ready`) tras deploy.
+- Validar accesibilidad por Ingress/Service.
+- Validar smoke test funcional de batalla web (crear batalla + ejecutar turnos).
+- Validar reinicio de pod y comportamiento esperado de sesión.
+- Registrar estimación de coste y consumo del entorno de prueba.
+
 ---
 
 ## 2. Unit Testing Specification
@@ -61,6 +69,19 @@ Cobertura adicional obligatoria v3.2:
 - **Cobertura mínima funcional**: smoke + validaciones de mecánicas core (HP + formación + moral 2d6)
 
 Nota: La adopción de JUnit puede planificarse como mejora futura, pero la validación actual obligatoria se realiza con tests `main`.
+
+### 2.4 Smoke tests cloud (v3.4)
+
+Checklist mínimo en AKS (entorno estudiante):
+
+1. `kubectl get pods` en estado `Running`.
+2. `kubectl get svc` y `kubectl get ingress` con endpoint publicado.
+3. `curl` o navegador responde en `/` con HTTP 200.
+4. Endpoints de health devuelven estado OK.
+5. Flujo funcional web básico:
+  - crear batalla
+  - ejecutar al menos 1 bloque de turnos
+  - ver log y estado actualizado
 
 ### 2.2 Estructura de Tests (Wargame Scale v3.0)
 ```

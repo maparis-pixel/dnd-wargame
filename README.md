@@ -38,6 +38,28 @@
 - Previsualización editable en formulario normalizado antes de guardar.
 - Tipos guardados reutilizables en creación de unidades.
 
+### ☁️ **Plan v3.4 (despliegue AKS con Azure for Students)**
+- Objetivo: desplegar la interfaz Web en cloud con coste mínimo para entorno de práctica.
+- Restricción: no existe AKS completamente gratis permanente; se operará dentro del crédito de estudiante.
+- Enfoque inicial: monolito web `DndWargames web` en AKS (sin separar microservicios todavía).
+- Recursos mínimos:
+  - 1 cluster AKS `tier free`
+  - 1 nodo `Standard_B2s` (o `Standard_DS2_v2` si no hay cuota)
+  - 1 namespace de aplicación (`dnd-wargames-dev`)
+- Entregables técnicos:
+  1. `Dockerfile` para empaquetar la app web
+  2. Manifests Kubernetes (`Deployment`, `Service`, `Ingress`, `ConfigMap`)
+  3. Health checks (`/health/live`, `/health/ready`)
+  4. Pipeline CI/CD básico (build + push + deploy)
+- Control de coste obligatorio:
+  - Presupuesto y alertas en Azure Cost Management
+  - Eliminación de recursos no usados fuera de sesiones de prueba
+  - Evitar componentes no esenciales (NAT Gateway dedicado, HA multi-zona)
+- Fases:
+  - Fase 1: Containerización + despliegue AKS mínimo
+  - Fase 2: Sesiones externas (Redis/DB) + observabilidad
+  - Fase 3: Hardening de seguridad + escalado controlado
+
 ### 📁 **Archivos Clave**
 - `src/com/dnd/wargames/` - Código fuente completo
 - `run_system.bat` - Ejecución automática completa

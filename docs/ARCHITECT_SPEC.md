@@ -37,6 +37,20 @@
     - El equipo de la unidad viva con mayor iniciativa actúa primero en ese turno.
     - Iniciativa tirada una vez por combatiente (`1d20 + mod DEX`).
 
+### 1.5 Plan Arquitectónico Cloud v3.4 (2026-03-01)
+- **Objetivo**: desplegar el modo web en AKS usando Azure for Students con coste mínimo.
+- **Estrategia**: migración inicial como monolito web containerizado (sin partición a microservicios en esta fase).
+- **Topología mínima objetivo**:
+    - 1 clúster AKS (`tier free`)
+    - 1 node pool con 1 nodo (`Standard_B2s` o fallback `Standard_DS2_v2`)
+    - Namespace `dnd-wargames-dev`
+    - `Deployment` + `Service` + `Ingress`
+- **Principios cloud**:
+    - Stateless en pods (evitar dependencia de sesiones en memoria local para producción)
+    - Configuración externalizada por variables de entorno/ConfigMap
+    - Observabilidad mínima: health/readiness + logs
+    - Control de coste como requisito arquitectónico de primer nivel
+
 ---
 
 ## 2. Componentes Principales (Wargame Scale v3.0)
@@ -165,6 +179,25 @@ WargameManager
 - Estas estadísticas se renderizan en:
     - CLI (`showUnits` y confirmación de creación)
     - Web (`formatUnits` en vista de batalla)
+
+### 2.6 Arquitectura de despliegue AKS (MVP)
+
+```
+Internet
+    ↓
+Ingress Controller
+    ↓
+Service (ClusterIP)
+    ↓
+Deployment (dnd-wargames-web)
+    ↓
+Pod Java (WebBattleServer)
+```
+
+- Imagen de contenedor publicada en registro (ACR o GHCR según coste/operativa).
+- Réplica inicial: 1 pod.
+- Escalado posterior: HPA en fase 2, tras validar consumo.
+- Persistencia de sesión: pendiente de externalización (Redis/DB) para alta disponibilidad real.
 
 ---
 

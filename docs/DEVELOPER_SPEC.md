@@ -45,6 +45,14 @@ Addendum tecnico v3.2 (obligatorio):
 - [x] La persecucion debe poder atacar unidades en retirada.
 - [x] Reagrupamiento: un solo intento con personaje aliado en trayectoria.
 
+Addendum tecnico v3.4 (AKS Azure for Students):
+- [ ] Añadir `Dockerfile` para ejecutar modo web en contenedor.
+- [ ] Crear manifiestos Kubernetes mínimos: `Deployment`, `Service`, `Ingress`, `ConfigMap`.
+- [ ] Parametrizar puerto/flags por variables de entorno (sin hardcode de entorno).
+- [ ] Definir endpoints de health: liveness y readiness.
+- [ ] Publicar imagen en registro y documentar comando de despliegue.
+- [ ] Mantener costes bajos: replica inicial = 1, recursos ajustados.
+
 ### 1.1 Naming Conventions
 - **Clases**: PascalCase (`Character`, `BattleEngine`)
 - **Métodos/Variables**: camelCase (`getHealth()`, `playerAction`)
@@ -104,6 +112,17 @@ public class MyClass {
     }
 }
 ```
+
+### 1.4 Flujo de entrega cloud (v3.4)
+
+Para iteraciones de despliegue AKS:
+
+1. Build local y compilación Java.
+2. Construcción de imagen de contenedor.
+3. Push de imagen a registry objetivo.
+4. Apply de manifiestos en AKS (`kubectl apply`).
+5. Smoke test web post-deploy (endpoint principal + health).
+6. Registro de coste/consumo estimado en documentación de sesión.
 
 ---
 

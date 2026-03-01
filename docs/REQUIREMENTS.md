@@ -23,6 +23,10 @@ El juego es un simulador de combate a **escala de batallón** (wargames) con mec
 - **Moral Warhammer**: Chequeo 2d6 vs valor de moral (2-12) cuando porta estandarte cae o 50% de bajas
 - **Huida**: Si falla moral, la unidad huye del combate
 
+### Objetivo Cloud (Plan v3.4)
+- Desplegar el modo web en AKS con suscripción **Azure for Students**.
+- Mantener coste mínimo operativo dentro del crédito disponible.
+
 ---
 
 ## 1. Requisitos Funcionales (FR)
@@ -258,6 +262,29 @@ Compania debe realizar chequeo 2d6 vs moral cuando:
 - Goblin
 - Skeleton
 - Ogre
+
+### FR-13: Despliegue en AKS (Azure for Students)
+**Descripción**: Ejecutar la interfaz web del sistema en Kubernetes administrado (AKS) para pruebas cloud.
+
+#### FR-13.1: Entorno mínimo AKS
+- Crear clúster AKS en `tier free`.
+- Ejecutar aplicación con **1 nodo** de tamaño pequeño (ej. `Standard_B2s`).
+- Desplegar aplicación web con `Deployment` + `Service` + `Ingress`.
+
+#### FR-13.2: Contenerización y configuración
+- Proveer imagen de contenedor ejecutable del modo web.
+- Parametrizar configuración por variables de entorno.
+- Permitir actualización de imagen sin reconstruir manifiestos base.
+
+#### FR-13.3: Operatividad mínima
+- Exponer endpoint web accesible para pruebas funcionales.
+- Incluir endpoints de salud para liveness/readiness.
+- Permitir redeploy sin intervención manual compleja.
+
+### NFR-7: Restricción de coste (Azure for Students)
+- El entorno cloud debe diseñarse con consumo mínimo.
+- Deben existir alertas de presupuesto y seguimiento de gasto.
+- Se evitarán recursos no esenciales en fase MVP (multi-zona, componentes premium no requeridos).
 
 ### FR-7: Sistema de Battlefield (Campo de Batalla)
 **Descripción**: Mapa hexagonal o cuadriculado para posicionamiento
